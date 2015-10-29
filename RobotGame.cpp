@@ -18,8 +18,8 @@
 #define SIZEOF_ARRAY(arr)       (sizeof(arr) / sizeof(arr[0]))
 
 const char* plugins[] = {
-		"../Scanner/Debug/libScanner.so",
-		"../Runner/Debug/libRunner.so",
+		"Robots/Scanner/Debug/libScanner.so",
+		"Robots/Runner/Debug/libRunner.so",
 };
 
 extern "C" {
