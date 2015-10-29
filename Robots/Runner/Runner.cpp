@@ -15,6 +15,7 @@ extern "C" RobotGame::Robot* getRobot(RobotGame::RobCtrl* robCtrl)
 }
 
 const struct RobotGame::tune_t Runner::myTune = {2 , 0 };
+const std::string Runner::myName("Runner");
 
 Runner::Runner(RobotGame::RobCtrl* robCtrl)
 : RobotGame::Robot(robCtrl)
