@@ -22,6 +22,15 @@ void RobCtrl::Runner(RobCtrl* obj)
 	obj->robot->run();
 }
 
+RobCtrl::RobCtrl(unsigned int posX, unsigned int posY)
+: name(""), robot(0), targetSpeed(0), currSpeed(0),
+targetDirection(0), currDirection(0),
+currArmor(MAX_ARMOR), currEnergy(MAX_ENERGY),
+maxSpeed(speedVals[0]), maxRange(rangeVals[0]),
+posX(posX), posY(posY), activeShells(0)
+{
+	lock();
+};
 
 RobCtrl::~RobCtrl() {
 	// TODO Auto-generated destructor stub
@@ -88,22 +97,73 @@ range_t RobCtrl::scan(angle_t direction, precision_t precision)
 
 int RobCtrl::cannon (angle_t direction, range_t range)
 {
-	if (currShots >= MAX_SHOOT || currEnergy < SHOOT_ENERGY_COST) {
+	if (activeShells >= MAX_SHOOT || currEnergy < SHOOT_ENERGY_COST) {
 		Logger::Log(robot, std::string("Cannon shot wasted"));
 
 		Scheduler::end(this);
 		return 0;
 	} else {
-		currShots++;
+		activeShells++;
 		if (range > maxRange)
 			range = maxRange;
-		Scheduler::addShoot(this, posX, posY, direction, range);
+		addShoot(posX, posY, direction, range);
 		currEnergy -= SHOOT_ENERGY_COST;
 		Logger::Log(robot, std::string("Cannon shot range=")+std::to_string(range));
 		Scheduler::end(this);
 		return 1;
 	}
 }
+
+void RobCtrl::cannon_tick(unsigned int tick)
+{
+	std::vector<CannonShell>::iterator it;
+
+	for (it=shells.begin(); it != shells.end(); ++it) {
+		if (! (*it).tick(tick) ) {
+			RobCtrl* robCtrl = Scheduler::iterateRobots(0);
+			while (robCtrl != 0) {
+				shotBlasted((*it).getX(), (*it).getY());
+				robCtrl = Scheduler::iterateRobots(robCtrl);
+			}
+		}
+	}
+	/* clean up blasted shells */
+	shells.erase(
+			std::remove_if(
+					shells.begin(),
+					shells.end(),
+					[] (const CannonShell& shell) { return shell.blasted();}
+			),
+			shells.end()
+	);
+	activeShells = shells.size();
+}
+
+void RobCtrl::shotBlasted(posx_t x, posy_t y)
+{
+	range_t distance = Trigonometry::distance(posX, posY, x, y);
+	armor_t damage = 0;
+	for (unsigned int i = 0; i < DAMAGE_RANGE_CNT; i++) {
+		if (distance <= damageRanges[i] ) {
+			damage = damageVals[i];
+			Logger::Log(name, std::string("Arghhh - hit loosing ") +
+							  std::to_string(damage) +
+							  std::string(" on armor"));
+			break;
+		}
+	}
+	currArmor -= std::min(currArmor,damage);
+}
+
+bool RobCtrl::addShoot(posx_t x, posy_t y, angle_t direction, range_t range)
+{
+	CannonShell shell(x, y, direction, range);
+	shells.push_back(shell);
+
+	return true;
+}
+
+
 void RobCtrl::drive (angle_t direction, speed_t speed)
 {
 	targetDirection = direction;

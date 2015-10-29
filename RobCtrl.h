@@ -22,21 +22,14 @@ public:
 	static void Runner(RobCtrl* obj);
 
 public:
-	RobCtrl(unsigned int posX, unsigned int posY)
-	: name(""), robot(0), targetSpeed(0), currSpeed(0),
-	targetDirection(0), currDirection(0),
-	currArmor(MAX_ARMOR), currEnergy(MAX_ENERGY),
-	maxSpeed(speedVals[0]), maxRange(rangeVals[0]),
-	posX(posX), posY(posY), currShots(0)
-	{
-		lock();
-	};
+	RobCtrl(unsigned int posX, unsigned int posY);
 	virtual ~RobCtrl();
 
 	void setRobot(Robot* robot);
 	Robot* getRobot() const { return robot; };
 
 	bool tick(unsigned int tick); /* Returns true if still alive */
+	void cannon_tick(unsigned int tick);
 	void lock() { mtx.lock();};
 	void unlock() { mtx.unlock(); };
 
@@ -54,6 +47,7 @@ public:
 	energy_t getEnergy() const ;
 	void armorToEnergy(armor_t sell);
 	void energyToArmor(energy_t sell);
+	void shotBlasted(posx_t x, posy_t y);
 
 public:
 	armor_t damage(armor_t damage);
@@ -61,6 +55,7 @@ public:
 private:
 	void adjustSpeed(speed_t target);
 	void adjustDirection(angle_t target);
+	bool addShoot(posx_t x, posy_t y, angle_t direction, range_t range);
 
 private:
 	std::string name; // Mostly to ease debug
@@ -75,7 +70,8 @@ private:
 	range_t maxRange;
 	posx_t posX;
 	posy_t posY;
-	unsigned int currShots;
+	unsigned int activeShells;
+	std::vector<CannonShell> shells;
 
 	std::mutex mtx;
 };
