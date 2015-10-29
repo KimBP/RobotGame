@@ -17,20 +17,14 @@ class CannonShell {
 private:
 	CannonShell() {};
 public:
-	CannonShell(RobCtrl* shooter,
-			posx_t posX, posy_t posY,
+	CannonShell(posx_t posX, posy_t posY,
 			angle_t direction, range_t range);
 	virtual ~CannonShell();
 
-	void tick(unsigned int tick);
-	bool blast() const; /* Returns true if blasted */
+	bool tick(unsigned int tick); /* Returns true if still in air */
+	bool blasted() const {return blast;};
 	posx_t getX() const {return currX;};
 	posy_t getY() const {return currY;};
-
-private:
-	void move(unsigned int x, unsigned int y,
-			angle_t direction, range_t distance,
-			unsigned int* newX, unsigned int* newY);
 
 private:
 	posx_t prevX;
@@ -40,8 +34,7 @@ private:
 	posy_t currY;
 	angle_t direction;
 	range_t range;
-	RobCtrl* shooter;
-	bool _blast;
+	bool blast;
 };
 
 } /* namespace RobotGame */
