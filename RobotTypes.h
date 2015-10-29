@@ -27,7 +27,7 @@ typedef int posy_t; 			/* 0..MAX_POS_Y - vertical position */
 const posx_t MAX_POS_Y = 9999;
 const posy_t MAX_POS_X = 9999;
 
-
+const energy_t ENERGY_FILLUP = 50;  /* Energy added for free each tick */
 const angle_t MAX_PRECISION = 15;
 
 const armor_t MAX_ARMOR = 100;     	/* Armor when not hurt at all */
@@ -70,6 +70,7 @@ const armor_t damageVals[DAMAGE_RANGE_CNT] = {8, 4, 2, 1};
 /* Energy:
  * 		Firing the cannon costs 200 energy points
  * 		Price of driving is analog to speed. I.e. driving 50 units/tick costs 50 energy points/tick
+ *      Each tick a robot is assigned 50 energy points (coming from solar panels)
  */
 /* Armor:
  * 		Being too close a blast from a cannon (including own) cost armor according to this scheme:
