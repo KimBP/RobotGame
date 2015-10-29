@@ -46,6 +46,11 @@ void Robot::drive (angle_t direction, speed_t speed)
 	robCtrl->drive(direction, speed);
 }
 
+void Robot::skip()
+{
+	robCtrl->skip();
+}
+
 speed_t Robot::getSpeed()
 {
 	return robCtrl->getSpeed();
