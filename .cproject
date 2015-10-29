@@ -48,6 +48,19 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1056232176.1192275311" name="/" resourcePath="Robots">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.859044554" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1808112731" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.661941628"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.578401555" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1059680010"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.468139360" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1211400432"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.525779417" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.564300833"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1739555039" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.425011699"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1481930330" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.131470821"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="Robots" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -119,4 +132,5 @@
 	<storageModule moduleId="refreshScope" versionNumber="1">
 		<resource resourceType="PROJECT" workspacePath="/RobotGame"/>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>
