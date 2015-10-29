@@ -23,7 +23,7 @@ public:
 
 public:
 	RobCtrl(unsigned int posX, unsigned int posY)
-	: robot(0), targetSpeed(0), currSpeed(0),
+	: name(""), robot(0), targetSpeed(0), currSpeed(0),
 	targetDirection(0), currDirection(0),
 	currArmor(MAX_ARMOR), currEnergy(MAX_ENERGY),
 	maxSpeed(speedVals[0]), maxRange(rangeVals[0]),
@@ -63,6 +63,7 @@ private:
 	void adjustDirection(angle_t target);
 
 private:
+	std::string name; // Mostly to ease debug
 	Robot* robot;
 	speed_t targetSpeed;
 	speed_t currSpeed;

@@ -25,7 +25,7 @@ public:
 	: robCtrl(robCtrl) {};
 
 	virtual ~Robot();
-	virtual struct tune_t init() = 0;
+	virtual struct tune_t init(std::string& name) = 0;
 	virtual void run() = 0;
 	virtual std::string name() const = 0;
 

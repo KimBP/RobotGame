@@ -31,7 +31,7 @@ void RobCtrl::setRobot(Robot* robot)
 {
 	int tune_params = MAX_TUNE;
 	this->robot = robot;
-	tune_t tune = robot->init();
+	tune_t tune = robot->init(name);
 	maxSpeed = speedVals[std::min(tune_params, tune.tune_speed)];
 	tune_params -= std::min(tune_params, tune.tune_speed);
 	maxRange = rangeVals[std::min(tune_params, tune.tune_cannon)];
