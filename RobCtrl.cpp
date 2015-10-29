@@ -308,7 +308,14 @@ bool RobCtrl::tick(unsigned int tick)
 			currArmor -= std::min(damage, currArmor);
 		}
 	}
-	return (currArmor > 0);
+
+	if (currArmor > 0) {
+		currEnergy += ENERGY_FILLUP;
+		if (currEnergy > MAX_ENERGY)
+			currEnergy = MAX_ENERGY;
+		return true;
+	}
+	return false;
 }
 
 armor_t RobCtrl::damage(armor_t damage)
