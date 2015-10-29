@@ -144,9 +144,11 @@ void Scheduler::run()
 	while (1) {
 		std::vector<RobCtrl*>::iterator robIt;
 		for (robIt = robots.begin(); robIt != robots.end(); ++robIt) {
-			Logger::Log((*robIt)->getRobot(), " *** Scheduled in");
-			(*robIt)->unlock();
-			schedulerMtx.lock();
+			if ((*robIt)->getArmor()) {
+				Logger::Log((*robIt)->getRobot(), " *** Scheduled in");
+				(*robIt)->unlock();
+				schedulerMtx.lock();
+			}
 		}
 		tickEnd();
 	}
