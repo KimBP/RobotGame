@@ -49,16 +49,6 @@ bool Scheduler::addRobot( Robot* (*getRobot)(RobCtrl* robCtrl))
 	return true;
 }
 
-bool Scheduler::addShoot(RobCtrl* shooter, unsigned int x, unsigned int y, angle_t direction, range_t range)
-{
-	Scheduler& inst = getScheduler();
-
-	CannonShell shell(shooter, x, y, direction, range);
-	inst.shells.push_back(shell);
-
-	return true;
-}
-
 RobCtrl* Scheduler::iterateRobots(RobCtrl* prev)
 {
 	Scheduler& inst = getScheduler();
@@ -82,8 +72,7 @@ RobCtrl* Scheduler::iterateRobots(RobCtrl* prev)
 
 void Scheduler::tickEnd()
 {
-	++tick;
-	Logger::LogHead(std::string("Starting tick") + std::to_string(tick));
+	Logger::LogHead(std::string("Ending tick ") + std::to_string(tick));
 
 	/* Iterate over all robots and update everything */
 	std::vector<RobCtrl*>::iterator robIt;
@@ -92,13 +81,11 @@ void Scheduler::tickEnd()
 		(*robIt)->tick(tick);
 	}
 
-	std::vector<CannonShell>::iterator shellIt;
-	for (shellIt = shells.begin(); shellIt != shells.end(); ++shellIt) {
-		shellIt->tick(tick);
-		if (shellIt->blast()) {
-			determineDamage(shellIt->getX(), shellIt->getY());
-		}
+	for (robIt = robots.begin(); robIt != robots.end(); ++robIt) {
+		(*robIt)->cannon_tick(tick);
 	}
+
+	++tick;
 
 	// Clean up
 // TODO: Won't compile - get back later
@@ -111,14 +98,6 @@ void Scheduler::tickEnd()
 //			robots.end()
 //	);
 
-	shells.erase(
-			std::remove_if(
-					shells.begin(),
-					shells.end(),
-					[] (const CannonShell& shell) { return shell.blast();}
-			),
-			shells.end()
-	);
 }
 
 void Scheduler::determineDamage(unsigned int x, unsigned int y)

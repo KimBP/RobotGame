@@ -22,7 +22,6 @@ public:
 	static Scheduler& getScheduler();
 	static void end(RobCtrl* robCtrl);
 	static bool addRobot( Robot* (*getRobot)(RobCtrl* robCtrl));
-	static bool addShoot(RobCtrl* shooter, unsigned int x, unsigned int y, angle_t direction, range_t range);
 	static RobCtrl* iterateRobots(RobCtrl* prev);
 
 
@@ -45,7 +44,6 @@ private:
 private:
 	std::vector<RobCtrl*> robots;
 	std::vector<std::thread> threads;
-	std::vector<CannonShell> shells;
 
 	unsigned int robCnt;
 	unsigned int tick;
