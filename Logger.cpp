@@ -14,11 +14,14 @@ Logger::~Logger() {
 	// TODO Auto-generated destructor stub
 }
 
-void Logger::Log(const Robot* robot, std::string msg)
+void Logger::Log(std::string name, std::string msg)
 {
 	Logger& inst = getLogger();
-	std::string str = "[" + robot->name() + "]: " + msg;
-	inst.queue.enqueue(str);
+	inst.queue.enqueue("[" + name + "]: "+msg);
+}
+void Logger::Log(const Robot* robot, std::string msg)
+{
+	Log(robot->name(),msg);
 }
 
 void Logger::LogHead(std::string msg)

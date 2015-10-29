@@ -22,6 +22,7 @@ public:
 	void Runner();
 	void DoDie();
 
+	static void Log(std::string name, std::string msg);
 	static void Log(const Robot* robot, std::string msg);
 	static void LogHead(std::string msg);
 	static void LogError(std::string error);
