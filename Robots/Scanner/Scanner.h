@@ -15,11 +15,15 @@ public:
 	Scanner(RobotGame::RobCtrl* robCtrl);
 	virtual ~Scanner();
 
-	virtual struct RobotGame::tune_t init() { return myTune; };
+	virtual struct RobotGame::tune_t init(std::string& name) {
+		name = myName;
+		return myTune;
+	};
 	virtual void run();
-	virtual std::string name() const { return "SCANNER"; };
+	virtual std::string name() const { return myName; };
 
 private:
+	static const std::string myName;
 	static const struct RobotGame::tune_t myTune;
 };
 
