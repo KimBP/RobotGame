@@ -36,6 +36,12 @@ void Logger::LogError(std::string error)
 	inst.queue.enqueue(std::string("ERROR: ") + error);
 }
 
+void Logger::LogWarning(std::string warning)
+{
+	Logger& inst = getLogger();
+	inst.queue.enqueue(std::string("WARNING: ") + warning);
+}
+
 void Logger::Runner() {
 	while(!goDie) {
 		std::string str = queue.dequeue();

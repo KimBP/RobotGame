@@ -26,6 +26,7 @@ public:
 	static void Log(const Robot* robot, std::string msg);
 	static void LogHead(std::string msg);
 	static void LogError(std::string error);
+	static void LogWarning(std::string warning);
 	static void Start();
 	static void End();
 
