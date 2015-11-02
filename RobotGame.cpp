@@ -14,6 +14,7 @@
 #include "Scheduler.h"
 #include "Logger.h"
 #include <thread>
+#include "Viewer.h"
 
 #define SIZEOF_ARRAY(arr)       (sizeof(arr) / sizeof(arr[0]))
 
@@ -47,6 +48,8 @@ getRobotFunc loadPlugin(const char* plugin)
 int main() {
 	std::thread logger(RobotGame::Logger::Start );
 
+	std::thread viewer(RobotGame::Viewer::Start);
+
 	RobotGame::Scheduler& scheduler = RobotGame::Scheduler::getScheduler();
 
 
@@ -61,7 +64,7 @@ int main() {
 	scheduler.run();
 
 	RobotGame::Logger::End();
-	// TODO: join
+	// TODO: join logger + viewer
 
 	return 0;
 }
