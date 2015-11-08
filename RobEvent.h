@@ -14,11 +14,20 @@ namespace RobotGame {
 
 class RobEvent {
 public:
-	RobEvent() {};
+	RobEvent(int id)
+	: id(id) {};
 	virtual ~RobEvent() {};
+
+	virtual void execute() = 0;
 
 	virtual posx_t getX() const = 0;
 	virtual posy_t getY() const = 0;
+
+	int getId() {return id; };
+
+private:
+	int id;
+
 };
 
 } /* namespace RobotGame */

@@ -14,9 +14,10 @@ namespace RobotGame {
 
 class RobotPosEvent: public RobotGame::RobEvent {
 public:
-	RobotPosEvent(posx_t x, posy_t y);
+	RobotPosEvent(int id, posx_t x, posy_t y);
 	virtual ~RobotPosEvent();
 
+	virtual void execute();
 	virtual posx_t getX() const;
 	virtual posy_t getY() const;
 
