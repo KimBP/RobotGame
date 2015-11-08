@@ -37,9 +37,11 @@
 								<option id="gnu.cpp.link.option.flags.341881677" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-rdynamic -pthread" valueType="string"/>
 								<option id="gnu.cpp.link.option.libs.2146131339" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="dl"/>
+									<listOptionValue builtIn="false" value="SDL2_gfx"/>
 									<listOptionValue builtIn="false" value="SDL2_image"/>
 									<listOptionValue builtIn="false" value="SDL2"/>
 								</option>
+								<option id="gnu.cpp.link.option.paths.2032628726" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.475958566" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
