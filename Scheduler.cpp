@@ -11,7 +11,9 @@
 #include <utility>
 #include <iostream>
 #include "Logger.h"
-
+#include "Viewer.h"
+#include "RobotPosEvent.h"
+#include "RobotTickEvent.h"
 namespace RobotGame {
 
 
@@ -30,6 +32,12 @@ void Scheduler::end(RobCtrl* robCtrl)
 	robCtrl->lock();
 }
 
+void Scheduler::end()
+{
+	Scheduler& inst = getScheduler();
+	Logger::Log("Viewer", "Frame update end");
+	inst.schedulerMtx.unlock();
+}
 
 Scheduler::~Scheduler() {
 	// TODO Auto-generated destructor stub
@@ -74,17 +82,22 @@ void Scheduler::tickEnd()
 {
 	Logger::LogHead(std::string("Ending tick ") + std::to_string(tick));
 
+	Viewer::PostEvent(new RobotTickEvent(false));
+
 	/* Iterate over all robots and update everything */
 	std::vector<RobCtrl*>::iterator robIt;
-
+	int id = 0;
 	for (robIt = robots.begin(); robIt != robots.end(); ++robIt) {
 		(*robIt)->tick(tick);
+		Viewer::PostEvent(new RobotPosEvent(id, (*robIt)->getX(),(*robIt)->getY()));
+		id++;
 	}
 
 	for (robIt = robots.begin(); robIt != robots.end(); ++robIt) {
 		(*robIt)->cannon_tick(tick);
 	}
 
+	Viewer::PostEvent(new RobotTickEvent(true));
 	++tick;
 
 	// Clean up
@@ -130,6 +143,7 @@ void Scheduler::run()
 			}
 		}
 		tickEnd();
+		schedulerMtx.lock(); // Wait for frame update
 	}
 
 	// TODO join

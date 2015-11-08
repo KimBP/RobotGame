@@ -23,7 +23,7 @@ public:
 	static void end(RobCtrl* robCtrl);
 	static bool addRobot( Robot* (*getRobot)(RobCtrl* robCtrl));
 	static RobCtrl* iterateRobots(RobCtrl* prev);
-
+	static void end();
 
 private:
 	Scheduler() :
