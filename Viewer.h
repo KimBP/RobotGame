@@ -11,10 +11,18 @@
 #include <SDL2/SDL.h>
 #include "RobEvent.h"
 #include "safequeue.h"
+#include <map>
 
 namespace RobotGame {
 
 class Viewer {
+private:
+	struct RobPos {
+		int x;
+		int y;
+		unsigned int color;
+	};
+
 public:
 	Viewer();
 	virtual ~Viewer();
@@ -22,14 +30,31 @@ public:
 	void Runner();
 
 	static void Start();
+	static void PostEvent(RobEvent* ev);
+
+	static void RobotShow(int id, int x, int y);
+	static void ClearArena();
+	static void RenderArena();
 
 private:
+	void _RobotShow(int id, int x, int y);
+	void _ClearArena();
+	void _RenderArena();
+	static unsigned int colors[];
 	static Viewer& getViewer();
+
+	void SetArenaViewPort();
+	void PrintRobot(unsigned int color, int x, int y);
+
+	void ArenaUpdate(int w, int h);
+	void StatusUpdate(int w, int h);
+
 	bool goDie;
 	SDL_Window* gWindow;
 	SDL_Renderer* gRenderer;
 
 	SafeQueue<RobEvent*> evQueue;
+	std::map<int, struct RobPos> robots;
 };
 
 } /* namespace RobotGame */
