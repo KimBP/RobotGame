@@ -13,7 +13,6 @@
 #include "Logger.h"
 #include "Viewer.h"
 #include "RobotPosEvent.h"
-#include "RobotTickEvent.h"
 namespace RobotGame {
 
 
@@ -82,8 +81,6 @@ void Scheduler::tickEnd()
 {
 	Logger::LogHead(std::string("Ending tick ") + std::to_string(tick));
 
-	Viewer::PostEvent(new RobotTickEvent(false));
-
 	/* Iterate over all robots and update everything */
 	std::vector<RobCtrl*>::iterator robIt;
 	int id = 0;
@@ -97,7 +94,6 @@ void Scheduler::tickEnd()
 		(*robIt)->cannon_tick(tick);
 	}
 
-	Viewer::PostEvent(new RobotTickEvent(true));
 	++tick;
 
 	// Clean up
