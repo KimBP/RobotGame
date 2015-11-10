@@ -29,6 +29,7 @@ unsigned int Viewer::colors[] = {
 #define SCREEN_WIDTH  (ARENA_WIDTH + STATUS_WIDTH)
 #define SCREEN_HEIGHT (std::max (ARENA_HEIGHT,STATUS_HEIGHT))
 
+#define POS_TO_MAP_SCALE	(10) // Divide all x,y position with 10
 // Singleton
 Viewer& Viewer::getViewer() {
 	static Viewer instance;
@@ -47,55 +48,49 @@ void Viewer::PostEvent(RobEvent* ev)
 
 void Viewer::ClearArena()
 {
-	getViewer()._ClearArena();
-}
-
-void Viewer::RenderArena()
-{
-	getViewer()._RenderArena();
-}
-
-void Viewer::_ClearArena()
-{
 	// Black - clear
 	SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
 	SDL_RenderClear( gRenderer );
 }
 
-void Viewer::_RenderArena()
-{
-	//Update screen
-	SDL_RenderPresent( gRenderer );
-}
 
 void Viewer::RobotShow(int id, int x, int y)
 {
-	Viewer& inst = getViewer();
-
-	inst._RobotShow(id, x, y);
+	getViewer()._RobotShow(id, x, y);
 }
 
 void Viewer::_RobotShow(int id, int x, int y)
 {
+	if (id >= 4)
+		return;
+
 	if (! robots.count(id)) {
-		robots[id].color = 0x00ff00ff;
+		robots[id].color = colors[id];
 	}
 
-	robots[id].x = x;
-	robots[id].y = y;
-	SetArenaViewPort();
-	PrintRobot(robots[id].color, x, y);
+	robots[id].x = x/POS_TO_MAP_SCALE;
+	robots[id].y = y/POS_TO_MAP_SCALE;
 }
 
 void Viewer::Runner()
 {
 	while(!goDie) {
-		while(!evQueue.empty()) {
+		do {
 			RobEvent* ev = evQueue.dequeue();
 
 			ev->execute();
 			delete ev;
+		} while(!evQueue.empty());
+
+		SetArenaViewPort();
+		ClearArena();
+
+		for (unsigned int i=0; i < robots.size(); i++) {
+			PrintRobot(robots[i].color, robots[i].x, robots[i].y);
 		}
+		SDL_RenderPresent( gRenderer );
+
+		SDL_PollEvent(0);
 		Scheduler::end();
 	}
 }
@@ -150,32 +145,6 @@ Viewer::~Viewer() {
 	}
 }
 
-void Viewer::ArenaUpdate(int w, int h)
-{
-	SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-
-	//Render red filled quad
-	SDL_Rect fillRect = { w / 4, h / 4, w / 2, h / 2 };
-	SDL_SetRenderDrawColor( gRenderer, 0xFF, 0x00, 0x00, 0xFF );
-	SDL_RenderFillRect( gRenderer, &fillRect );
-
-	//Render green outlined quad
-	SDL_Rect outlineRect = { w / 6, h / 6, w * 2 / 3, h * 2 / 3 };
-	SDL_SetRenderDrawColor( gRenderer, 0x00, 0xFF, 0x00, 0xFF );
-	SDL_RenderDrawRect( gRenderer, &outlineRect );
-
-	//Draw blue horizontal line
-	SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0xFF, 0xFF );
-	SDL_RenderDrawLine( gRenderer, 0, ARENA_HEIGHT / 2, ARENA_WIDTH, ARENA_HEIGHT / 2 );
-
-	//Draw vertical line of yellow dots
-	SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0x00, 0xFF );
-	for( int i = 0; i < h; i += 4 )
-	{
-		SDL_RenderDrawPoint( gRenderer, w / 2, i );
-	}
-
-}
 void Viewer::StatusUpdate(int w, int h)
 {
 	//Render red filled quad
@@ -187,32 +156,26 @@ void Viewer::StatusUpdate(int w, int h)
 
 void Viewer::SetArenaViewPort()
 {
-	SDL_Rect topLeftViewport;
-	topLeftViewport.x = STATUS_WIDTH;
-	topLeftViewport.y = 0;
-	topLeftViewport.w = ARENA_WIDTH;
-	topLeftViewport.h = ARENA_HEIGHT;
-	SDL_RenderSetViewport( gRenderer, &topLeftViewport );
+	arenaViewport.x = STATUS_WIDTH;
+	arenaViewport.y = 0;
+	arenaViewport.w = ARENA_WIDTH;
+	arenaViewport.h = ARENA_HEIGHT;
+	SDL_RenderSetViewport( gRenderer, &arenaViewport );
 }
 
 void Viewer::PrintRobot(unsigned int color, int x, int y)
 {
-	SDL_Rect fillRect = { x-2, y-2, 5, 5 };
-	SDL_SetRenderDrawColor( gRenderer, 0xFF, 0x00, 0x00, 0xFF );
-	SDL_RenderFillRect( gRenderer, &fillRect );
+#define ROBOT_RADIUS 5
 
+//	SDL_Rect fillRect = { x-2, y-2, 5, 5 };
 //	SDL_SetRenderDrawColor(gRenderer,
 //							(color>>0) & 0xFF,
 //							(color>>8) & 0xFF,
 //							(color>>16) & 0xFF,
 //							(color>>24) & 0xFF);
+//	SDL_RenderFillRect( gRenderer, &fillRect );
 
-#define ROBOT_RADIUS 5
-//	Draw_FillCircle(gRenderer,
-//	                     x, y, ROBOT_RADIUS,
-//	                     color);
-
-//	filledCircleColor(gRenderer, x, y, ROBOT_RADIUS, color);
+	filledCircleColor(gRenderer, x, y, ROBOT_RADIUS, color);
 }
 
 }

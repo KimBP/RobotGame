@@ -33,13 +33,11 @@ public:
 	static void PostEvent(RobEvent* ev);
 
 	static void RobotShow(int id, int x, int y);
-	static void ClearArena();
-	static void RenderArena();
 
 private:
 	void _RobotShow(int id, int x, int y);
-	void _ClearArena();
-	void _RenderArena();
+	void ClearArena();
+	void RenderArena();
 	static unsigned int colors[];
 	static Viewer& getViewer();
 
@@ -52,6 +50,7 @@ private:
 	bool goDie;
 	SDL_Window* gWindow;
 	SDL_Renderer* gRenderer;
+	SDL_Rect arenaViewport;
 
 	SafeQueue<RobEvent*> evQueue;
 	std::map<int, struct RobPos> robots;
