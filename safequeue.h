@@ -55,6 +55,10 @@ public:
     return val;
   }
 
+  unsigned int size() {
+	  return q.size();
+  }
+
   bool empty(void)
   {
 	 return q.empty();
