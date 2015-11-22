@@ -12,6 +12,7 @@
 #include "RobEvent.h"
 #include "safequeue.h"
 #include <map>
+#include <mutex>
 
 namespace RobotGame {
 
@@ -22,6 +23,13 @@ private:
 		int y;
 		unsigned int color;
 	};
+	struct ShellPos {
+		int x1;
+		int y1;
+		int x2;
+		int y2;
+		bool blasted;
+	};
 
 public:
 	Viewer();
@@ -29,21 +37,24 @@ public:
 
 	void Runner();
 
+	static void tick(unsigned int tick);
 	static void Start();
 	static void PostEvent(RobEvent* ev);
 
 	static void RobotShow(int id, int x, int y);
-
+	static void CannonShow(int id, int x1, int y1, int x2, int y2, bool blasted);
 private:
 	void _RobotShow(int id, int x, int y);
+	void _CannonShow(struct ShellPos shell);
 	void ClearArena();
 	void RenderArena();
 	static unsigned int colors[];
 	static Viewer& getViewer();
+	std::mutex eventProcess;
 
 	void SetArenaViewPort();
 	void PrintRobot(unsigned int color, int x, int y);
-
+	void PrintShell(struct ShellPos shell);
 	void ArenaUpdate(int w, int h);
 	void StatusUpdate(int w, int h);
 
@@ -54,6 +65,7 @@ private:
 
 	SafeQueue<RobEvent*> evQueue;
 	std::map<int, struct RobPos> robots;
+	std::vector<struct ShellPos> shells;
 };
 
 } /* namespace RobotGame */

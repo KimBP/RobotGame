@@ -11,7 +11,6 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 
-//#include <stdlib.h>
 
 namespace RobotGame {
 
@@ -46,6 +45,11 @@ void Viewer::PostEvent(RobEvent* ev)
 	getViewer().evQueue.enqueue(ev);
 }
 
+void Viewer::tick(unsigned int tick)
+{
+	getViewer().eventProcess.unlock();
+}
+
 void Viewer::ClearArena()
 {
 	// Black - clear
@@ -53,6 +57,20 @@ void Viewer::ClearArena()
 	SDL_RenderClear( gRenderer );
 }
 
+void Viewer::CannonShow(int id, int x1, int y1, int x2, int y2, bool blasted)
+{
+	struct ShellPos shell;
+	shell.x1 = x1/POS_TO_MAP_SCALE;
+	shell.x2 = x2/POS_TO_MAP_SCALE;
+	shell.y1 = y1/POS_TO_MAP_SCALE;
+	shell.y2 = y2/POS_TO_MAP_SCALE;
+	shell.blasted = blasted;
+	getViewer()._CannonShow(shell);
+}
+void Viewer::_CannonShow(struct ShellPos shell)
+{
+	shells.push_back(shell);
+}
 
 void Viewer::RobotShow(int id, int x, int y)
 {
@@ -75,22 +93,35 @@ void Viewer::_RobotShow(int id, int x, int y)
 void Viewer::Runner()
 {
 	while(!goDie) {
-		do {
+
+		eventProcess.lock();
+		Logger::LogDebug(std::string("Queue has ") + std::to_string(evQueue.size()) + std::string(" element(s)"));
+		while (!evQueue.empty()) {
 			RobEvent* ev = evQueue.dequeue();
 
 			ev->execute();
 			delete ev;
-		} while(!evQueue.empty());
-
+		}
 		SetArenaViewPort();
 		ClearArena();
 
 		for (unsigned int i=0; i < robots.size(); i++) {
 			PrintRobot(robots[i].color, robots[i].x, robots[i].y);
 		}
+		for (unsigned int i=0; i < shells.size(); i++) {
+			PrintShell(shells[i]);
+		}
+		shells.clear();
 		SDL_RenderPresent( gRenderer );
 
-		SDL_PollEvent(0);
+		SDL_Event event;
+		if (SDL_PollEvent(&event)) {
+			if( event.type == SDL_QUIT )
+			{
+				goDie = true;
+			}
+		}
+
 		Scheduler::end();
 	}
 }
@@ -136,6 +167,9 @@ Viewer::Viewer()
 		goDie = true;
 		return;
 	}
+
+	// Wait for scheduler to make us run
+	eventProcess.lock();
 }
 
 Viewer::~Viewer() {
@@ -163,17 +197,20 @@ void Viewer::SetArenaViewPort()
 	SDL_RenderSetViewport( gRenderer, &arenaViewport );
 }
 
+void Viewer::PrintShell(struct ShellPos shell)
+{
+
+	SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xF0, 0x02, 0xFF );
+	SDL_RenderDrawLine(gRenderer, shell.x1, shell.y1,shell.x2, shell.y2);
+	if (shell.blasted ) {
+		filledCircleColor(gRenderer, shell.x2, shell.y2, 40, 0xFFF002FF);
+	}
+}
+
 void Viewer::PrintRobot(unsigned int color, int x, int y)
 {
 #define ROBOT_RADIUS 5
 
-//	SDL_Rect fillRect = { x-2, y-2, 5, 5 };
-//	SDL_SetRenderDrawColor(gRenderer,
-//							(color>>0) & 0xFF,
-//							(color>>8) & 0xFF,
-//							(color>>16) & 0xFF,
-//							(color>>24) & 0xFF);
-//	SDL_RenderFillRect( gRenderer, &fillRect );
 
 	filledCircleColor(gRenderer, x, y, ROBOT_RADIUS, color);
 }
