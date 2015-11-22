@@ -42,6 +42,24 @@ void Logger::LogWarning(std::string warning)
 	inst.queue.enqueue(std::string("WARNING: ") + warning);
 }
 
+void Logger::LogDebug(std::string msg)
+{
+	Logger& inst = getLogger();
+	if (inst.showDebug) {
+		inst.queue.enqueue(std::string("DEBUG: ") + msg);
+	}
+}
+void Logger::EnableDebug()
+{
+	Logger& inst = getLogger();
+	inst.showDebug = true;
+}
+void Logger::DisableDebug()
+{
+	Logger& inst = getLogger();
+	inst.showDebug = false;
+}
+
 void Logger::Runner() {
 	while(!goDie) {
 		std::string str = queue.dequeue();
