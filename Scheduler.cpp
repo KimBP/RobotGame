@@ -101,6 +101,14 @@ void Scheduler::tickEnd()
 
 	++tick;
 
+	robots.erase(
+			std::remove_if(
+					robots.begin(),
+					robots.end(),
+					[] (RobCtrl* rob) { return (rob->getArmor() == 0);}
+			),
+			robots.end()
+	);
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
