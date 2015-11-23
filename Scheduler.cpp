@@ -96,34 +96,8 @@ void Scheduler::tickEnd()
 
 	++tick;
 
-	// Clean up
-// TODO: Won't compile - get back later
-//	robots.erase(
-//			std::remove_if(
-//					robots.begin(),
-//					robots.end(),
-//					[] (const RobCtrl* rob) { (rob->getArmor() == 0);}
-//			),
-//			robots.end()
-//	);
 
-}
 
-void Scheduler::determineDamage(unsigned int x, unsigned int y)
-{
-	std::vector<RobCtrl*>::iterator robIt;
-	for (robIt = robots.begin(); robIt != robots.end(); ++robIt) {
-		unsigned int robX = (*robIt)->getX();
-		unsigned int robY = (*robIt)->getY();
-
-		range_t dist = Trigonometry::distance(x,y, robX, robY);
-		for (unsigned int i=0; i < DAMAGE_RANGE_CNT; i++) {
-			if (dist <= damageRanges[i] ) {
-				(*robIt)->damage(damageVals[i]);
-				break;
-			}
-		}
-	}
 }
 
 void Scheduler::run()

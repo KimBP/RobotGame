@@ -36,7 +36,6 @@ public:
 	void run();
 
 	const unsigned int getTick() { return tick;};
-	void determineDamage(unsigned int x, unsigned int y);
 
 private:
 	void tickEnd();
