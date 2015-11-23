@@ -22,7 +22,7 @@ Scheduler& Scheduler::getScheduler() {
 	return instance;
 }
 
-/* Schedule out out current task */
+/* Schedule out current task */
 void Scheduler::end(RobCtrl* robCtrl)
 {
 	Scheduler& inst = getScheduler();
@@ -80,22 +80,23 @@ RobCtrl* Scheduler::iterateRobots(RobCtrl* prev)
 void Scheduler::tickEnd()
 {
 	Logger::LogHead(std::string("Ending tick ") + std::to_string(tick));
-
+	RobCtrl* robCtrl;
 	/* Iterate over all robots and update everything */
-	std::vector<RobCtrl*>::iterator robIt;
+	robCtrl = iterateRobots(0);
 	int id = 0;
-	for (robIt = robots.begin(); robIt != robots.end(); ++robIt) {
-		(*robIt)->tick(tick);
-		Viewer::PostEvent(new RobotPosEvent(id, (*robIt)->getX(),(*robIt)->getY()));
+	while (0 != robCtrl) {
+		robCtrl->tick(tick);
+		Viewer::PostEvent(new RobotPosEvent(id, robCtrl->getX(), robCtrl->getY()));
 		id++;
+		robCtrl = iterateRobots(robCtrl);
 	}
 
-	for (robIt = robots.begin(); robIt != robots.end(); ++robIt) {
-		(*robIt)->cannon_tick(tick);
-	}
+	CannonShell::tick(tick);
+	Viewer::tick(tick);
+	schedulerMtx.lock(); // Wait for frame update
+
 
 	++tick;
-
 
 
 }
@@ -113,7 +114,6 @@ void Scheduler::run()
 			}
 		}
 		tickEnd();
-		schedulerMtx.lock(); // Wait for frame update
 	}
 
 	// TODO join
