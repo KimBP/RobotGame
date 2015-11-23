@@ -13,6 +13,9 @@
 #include "Logger.h"
 #include "Viewer.h"
 #include "RobotPosEvent.h"
+#include <chrono>
+#include <thread>
+
 namespace RobotGame {
 
 
@@ -99,6 +102,7 @@ void Scheduler::tickEnd()
 	++tick;
 
 
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 void Scheduler::run()
