@@ -18,8 +18,6 @@ public:
 	virtual ~RobotPosEvent();
 
 	virtual void execute();
-	virtual posx_t getX() const;
-	virtual posy_t getY() const;
 
 private:
 	posx_t posX;

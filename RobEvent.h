@@ -20,9 +20,6 @@ public:
 
 	virtual void execute() = 0;
 
-	virtual posx_t getX() const = 0;
-	virtual posy_t getY() const = 0;
-
 	int getId() {return id; };
 
 private:

@@ -23,14 +23,5 @@ void RobotPosEvent::execute()
 	Viewer::RobotShow(getId(), posX, posY);
 }
 
-posx_t RobotPosEvent::getX() const
-{
-	return posX;
-}
-
-posy_t RobotPosEvent::getY() const
-{
-	return posY;
-}
 
 } /* namespace RobotGame */
