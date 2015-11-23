@@ -29,7 +29,6 @@ public:
 	Robot* getRobot() const { return robot; };
 
 	bool tick(unsigned int tick); /* Returns true if still alive */
-	void cannon_tick(unsigned int tick);
 	void lock() { mtx.lock();};
 	void unlock() { mtx.unlock(); };
 
@@ -47,7 +46,7 @@ public:
 	energy_t getEnergy() const ;
 	void armorToEnergy(armor_t sell);
 	void energyToArmor(energy_t sell);
-	void shotBlasted(posx_t x, posy_t y);
+	void shotBlasted(RobCtrl* owner, posx_t x, posy_t y);
 
 public:
 	armor_t damage(armor_t damage);
@@ -71,7 +70,6 @@ private:
 	posx_t posX;
 	posy_t posY;
 	unsigned int activeShells;
-	std::vector<CannonShell> shells;
 
 	std::mutex mtx;
 };

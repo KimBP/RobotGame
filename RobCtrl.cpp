@@ -114,35 +114,16 @@ int RobCtrl::cannon (angle_t direction, range_t range)
 	}
 }
 
-void RobCtrl::cannon_tick(unsigned int tick)
-{
-	std::vector<CannonShell>::iterator it;
-
-	for (it=shells.begin(); it != shells.end(); ++it) {
-		if (! (*it).tick(tick) ) {
-			RobCtrl* robCtrl = Scheduler::iterateRobots(0);
-			while (robCtrl != 0) {
-				shotBlasted((*it).getX(), (*it).getY());
-				robCtrl = Scheduler::iterateRobots(robCtrl);
-			}
-		}
-	}
-	/* clean up blasted shells */
-	shells.erase(
-			std::remove_if(
-					shells.begin(),
-					shells.end(),
-					[] (const CannonShell& shell) { return shell.blasted();}
-			),
-			shells.end()
-	);
-	activeShells = shells.size();
-}
-
-void RobCtrl::shotBlasted(posx_t x, posy_t y)
+void RobCtrl::shotBlasted(RobCtrl* owner, posx_t x, posy_t y)
 {
 	range_t distance = Trigonometry::distance(posX, posY, x, y);
 	armor_t damage = 0;
+
+	// Was it our shell
+	if (this == owner) {
+		activeShells--;
+	}
+	// Did it hit us
 	for (unsigned int i = 0; i < DAMAGE_RANGE_CNT; i++) {
 		if (distance <= damageRanges[i] ) {
 			damage = damageVals[i];
@@ -157,8 +138,7 @@ void RobCtrl::shotBlasted(posx_t x, posy_t y)
 
 bool RobCtrl::addShoot(posx_t x, posy_t y, angle_t direction, range_t range)
 {
-	CannonShell shell(x, y, direction, range);
-	shells.push_back(shell);
+	CannonShell::FireShell(this, x, y, direction, range);
 
 	return true;
 }
