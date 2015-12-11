@@ -163,34 +163,11 @@ void RobCtrl::skip()
 	Scheduler::end(this);
 }
 
-speed_t RobCtrl::getSpeed() const
-{
-	return currSpeed;
-}
-angle_t RobCtrl::getDirection() const
-{
-	return currDirection;
-}
-unsigned int RobCtrl::getX() const
-{
-	return posX;
-}
-unsigned int RobCtrl::getY() const
-{
-	return posY;
-}
 int RobCtrl::getTick() const
 {
 	return 0; // TODO
 }
-armor_t RobCtrl::getArmor() const
-{
-	return currArmor;
-}
-energy_t RobCtrl::getEnergy() const
-{
-	return currEnergy;
-}
+
 void RobCtrl::armorToEnergy(armor_t sell)
 {
 	if (sell < currArmor) {
