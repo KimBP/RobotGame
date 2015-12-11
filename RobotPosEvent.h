@@ -18,6 +18,7 @@ public:
 	virtual ~RobotPosEvent();
 
 	virtual void execute();
+	virtual std::string getName() { return "PosEvent"; };
 
 private:
 	posx_t posX;
