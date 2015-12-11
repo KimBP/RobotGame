@@ -9,6 +9,7 @@
 #define ROBEVENT_H_
 
 #include "RobotTypes.h"
+#include <string>
 
 namespace RobotGame {
 
@@ -19,7 +20,7 @@ public:
 	virtual ~RobEvent() {};
 
 	virtual void execute() = 0;
-
+	virtual std::string getName() = 0;
 	int getId() {return id; };
 
 private:
