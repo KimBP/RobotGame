@@ -40,6 +40,16 @@ void Viewer::Start() {
 	getViewer().Runner();
 }
 
+void Viewer::End() {
+	Viewer& inst = getViewer();
+
+	inst.DoDie();
+}
+
+void Viewer::DoDie() {
+	goDie = true;
+}
+
 void Viewer::PostEvent(RobEvent* ev)
 {
 	getViewer().evQueue.enqueue(ev);

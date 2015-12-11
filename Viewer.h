@@ -45,6 +45,7 @@ public:
 
 	void Runner();
 
+	static void End();
 	static void tick(unsigned int tick);
 	static void Start();
 	static void PostEvent(RobEvent* ev);
@@ -53,6 +54,7 @@ public:
 	static void RobotDataShow(int id, std::string name, int armor, int energy);
 	static void CannonShow(int id, int x1, int y1, int x2, int y2, bool blasted);
 private:
+	void DoDie();
 	void _RobotShow(int id, int x, int y);
 	void _RobotDataShow(int id, std::string name, int armor, int energy);
 	void _CannonShow(struct ShellPos shell);
