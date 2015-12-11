@@ -84,10 +84,43 @@ void Viewer::_RobotShow(int id, int x, int y)
 
 	if (! robots.count(id)) {
 		robots[id].color = colors[id];
+		robots[id].nameTexture = 0;
 	}
 
 	robots[id].x = x/POS_TO_MAP_SCALE;
 	robots[id].y = y/POS_TO_MAP_SCALE;
+}
+
+void Viewer::RobotDataShow(int id, std::string name, int armor, int energy)
+{
+	getViewer()._RobotDataShow(id, name, armor, energy);
+}
+
+void Viewer::_RobotDataShow(int id, std::string name, int armor, int energy)
+{
+	SDL_Color col = {
+			static_cast<Uint8>((robots[id].color >> 24) & 0xff),
+			static_cast<Uint8>((robots[id].color >> 16) & 0xff),
+			static_cast<Uint8>((robots[id].color >> 8) & 0xff),
+			static_cast<Uint8>((robots[id].color >> 0) & 0xff)
+	};
+	if (!robots[id].nameTexture) {
+		SDL_Surface* surface = TTF_RenderText_Solid( gFont, name.c_str(), col );
+
+		robots[id].nameTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
+		SDL_FreeSurface(surface);
+
+		surface = TTF_RenderText_Solid( gFont, "E: ", col);
+		robots[id].energyTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
+		SDL_FreeSurface(surface);
+
+		surface = TTF_RenderText_Solid( gFont, "A: ", col);
+		robots[id].armorTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
+		SDL_FreeSurface(surface);
+
+	}
+	robots[id].armor = armor;
+	robots[id].energy = energy;
 }
 
 void Viewer::Runner()
@@ -112,6 +145,13 @@ void Viewer::Runner()
 			PrintShell(shells[i]);
 		}
 		shells.clear();
+		SDL_RenderPresent( gRenderer );
+
+		SetStatusViewPort();
+		ClearStatus();
+		for (unsigned int i=0; i < robots.size(); i++) {
+			PrintRobotStatus(i);
+		}
 		SDL_RenderPresent( gRenderer );
 
 		SDL_Event event;
@@ -168,6 +208,10 @@ Viewer::Viewer()
 		return;
 	}
 
+	// font handling
+	TTF_Init();
+	gFont = TTF_OpenFont( "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf", 18 );
+
 	// Wait for scheduler to make us run
 	eventProcess.lock();
 }
@@ -214,6 +258,74 @@ void Viewer::PrintRobot(unsigned int color, int x, int y)
 
 	filledCircleColor(gRenderer, x, y, ROBOT_RADIUS, color);
 }
+
+void Viewer::SetStatusViewPort()
+{
+	statusViewPort.x = 0;
+	statusViewPort.y = 0;
+	statusViewPort.w = STATUS_WIDTH;
+	statusViewPort.h = ARENA_HEIGHT;
+	SDL_RenderSetViewport( gRenderer, &statusViewPort );
+}
+
+void Viewer::ClearStatus()
+{
+	// Black - clear
+	SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+	SDL_RenderClear( gRenderer );
+
+}
+void Viewer::PrintRobotStatus(int id)
+{
+	int robStatusHeight = ARENA_HEIGHT / maxRobots;
+	int robStatusY      = id * robStatusHeight;
+
+	const int blockHeight = 40;
+	const int prefixWidth = 40;
+
+	SDL_Rect viewPort;
+	viewPort.x = 0;
+	viewPort.y = robStatusY;
+	viewPort.w = STATUS_WIDTH;
+	viewPort.h = robStatusHeight;
+	SDL_RenderSetViewport(gRenderer, &viewPort);
+
+	SDL_SetRenderDrawColor( gRenderer,
+			(robots[id].color >> 24)& 0xFF, (robots[id].color >> 16) & 0xFF,
+			(robots[id].color >> 8) & 0xFF, robots[id].color & 0xFF);
+
+	SDL_Rect nameRect;
+	nameRect.x = 1;
+	nameRect.y = 1;
+	nameRect.w = STATUS_WIDTH-2;
+	nameRect.h = 2*blockHeight-2;
+	if (SDL_RenderCopy( gRenderer, robots[id].nameTexture, 0, &nameRect)) {
+		Logger::LogDebug("Error rendering name");
+	}
+
+	nameRect.x = 1;
+	nameRect.y = 2*blockHeight + 1;
+	nameRect.w = prefixWidth - 2;
+	nameRect.h = blockHeight - 2;
+	if (SDL_RenderCopy( gRenderer, robots[id].energyTexture, 0, &nameRect)) {
+		Logger::LogDebug("Error rendering energy");
+	}
+
+	nameRect.x = 1;
+	nameRect.y = 3*blockHeight + 1;
+	nameRect.w = prefixWidth - 2;
+	nameRect.h = blockHeight - 2;
+	if (SDL_RenderCopy( gRenderer, robots[id].armorTexture, 0, &nameRect)) {
+		Logger::LogDebug("Error rendering energy");
+	}
+
+	int energy = robots[id].energy * (STATUS_WIDTH - prefixWidth) / MAX_ENERGY;
+	int armor = robots[id].armor * (STATUS_WIDTH - prefixWidth) / MAX_ARMOR;
+	SDL_RenderDrawLine(gRenderer, prefixWidth, 2.5*blockHeight, 40+energy, 2.5*blockHeight);
+	SDL_RenderDrawLine(gRenderer, prefixWidth, 3.5*blockHeight, 40+armor, 3.5*blockHeight);
+}
+
+
 
 }
 /* namespace RobotGame */
