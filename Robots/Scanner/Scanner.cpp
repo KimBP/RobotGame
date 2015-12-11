@@ -49,7 +49,7 @@ void Scanner::run()
 			scanRange = 0;
 		} else {
 			// Make new scan
-			lastScan += 30;
+			lastScan += 10;
 			lastScan %= 360;
 			scanRange = scan(lastScan, 10);
 			if (scanRange < RobotGame::damageRanges[RobotGame::DAMAGE_RANGE_CNT-1])
