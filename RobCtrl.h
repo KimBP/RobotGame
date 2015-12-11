@@ -48,6 +48,8 @@ public:
 	void energyToArmor(energy_t sell);
 	void shotBlasted(RobCtrl* owner, posx_t x, posy_t y);
 	std::string getName() const { return name; };
+	void doDie() { goDie = true; };
+	void checkGoDie() { if (goDie) {exit(0); } };
 
 public:
 	armor_t damage(armor_t damage);
@@ -72,6 +74,7 @@ private:
 	posy_t posY;
 	unsigned int activeShells;
 
+	bool goDie;
 	std::mutex mtx;
 };
 

@@ -27,7 +27,8 @@ RobCtrl::RobCtrl(unsigned int posX, unsigned int posY)
 targetDirection(0), currDirection(0),
 currArmor(MAX_ARMOR), currEnergy(MAX_ENERGY),
 maxSpeed(speedVals[0]), maxRange(rangeVals[0]),
-posX(posX), posY(posY), activeShells(0)
+posX(posX), posY(posY), activeShells(0),
+goDie(false)
 {
 	lock();
 };
