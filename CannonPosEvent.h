@@ -18,6 +18,7 @@ public:
 	virtual ~CannonPosEvent();
 
 	virtual void execute();
+	virtual std::string getName() { return "CannonPos"; };
 
 private:
 	posx_t posX1;
