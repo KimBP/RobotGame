@@ -47,6 +47,7 @@ public:
 	void armorToEnergy(armor_t sell);
 	void energyToArmor(energy_t sell);
 	void shotBlasted(RobCtrl* owner, posx_t x, posy_t y);
+	std::string getName() const { return name; };
 
 public:
 	armor_t damage(armor_t damage);
@@ -57,7 +58,7 @@ private:
 	bool addShoot(posx_t x, posy_t y, angle_t direction, range_t range);
 
 private:
-	std::string name; // Mostly to ease debug
+	std::string name;
 	Robot* robot;
 	speed_t targetSpeed;
 	speed_t currSpeed;
