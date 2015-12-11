@@ -39,7 +39,7 @@ const speed_t MAX_DIR_CHANGE_SPEED = 50; /* Max speed at which direction change 
 const angle_t MAX_DIR_CHANGE = 45;       /* Max direction change pr tick */
 const speed_t MAX_REVERSE_SPEED = -50;
 
-const speed_t SHELL_SPEED = 200; /* units/tick */
+const speed_t SHELL_SPEED = 700; /* units/tick */
 
 const speed_t speedVals[] = {50, 75, 100};
 const range_t rangeVals[] = {5000, 6000, 7000};
@@ -52,7 +52,7 @@ struct tune_t {
 };
 
 const unsigned int DAMAGE_RANGE_CNT = 4;
-const range_t damageRanges[DAMAGE_RANGE_CNT] = {10, 20, 30, 40};
+const range_t damageRanges[DAMAGE_RANGE_CNT] = {100, 200, 300, 400};
 const armor_t damageVals[DAMAGE_RANGE_CNT] = {8, 4, 2, 1};
 
 
