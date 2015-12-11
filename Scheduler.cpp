@@ -13,6 +13,7 @@
 #include "Logger.h"
 #include "Viewer.h"
 #include "RobotPosEvent.h"
+#include "RobotDataEvent.h"
 #include <chrono>
 #include <thread>
 
@@ -95,6 +96,17 @@ void Scheduler::tickEnd()
 	}
 
 	CannonShell::tick(tick);
+
+
+	robCtrl = iterateRobots(0);
+	id = 0;
+	while (0 != robCtrl) {
+		Viewer::PostEvent(new RobotDataEvent(id, robCtrl->getName(),
+						robCtrl->getArmor(), robCtrl->getEnergy()));
+		id++;
+		robCtrl = iterateRobots(robCtrl);
+	}
+
 	Viewer::tick(tick);
 	schedulerMtx.lock(); // Wait for frame update
 
@@ -105,18 +117,24 @@ void Scheduler::tickEnd()
 			std::remove_if(
 					robots.begin(),
 					robots.end(),
-					[] (RobCtrl* rob) { return (rob->getArmor() == 0);}
+					[] (RobCtrl* rob) {
+						if (rob->getArmor() == 0) {
+							rob->doDie();
+							return true;
+						}
+						return false;
+					}
 			),
 			robots.end()
 	);
 
-	std::this_thread::sleep_for(std::chrono::seconds(1));
+	//std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 void Scheduler::run()
 {
 	schedulerMtx.lock();
-	while (1) {
+	while (robots.size() > 1) {
 		std::vector<RobCtrl*>::iterator robIt;
 		for (robIt = robots.begin(); robIt != robots.end(); ++robIt) {
 			if ((*robIt)->getArmor()) {
@@ -128,7 +146,18 @@ void Scheduler::run()
 		tickEnd();
 	}
 
-	// TODO join
+	Logger::LogHead("Game over");
+	Logger::Log(robots[0]->getName(), "WINNER");
+
+	// Kill winner
+	robots[0]->doDie();
+	robots[0]->unlock();
+	while(!threads.empty()) {
+		threads.back().join();
+		threads.pop_back();
+	}
+
+
 }
 
 } /* namespace RobotGame */
