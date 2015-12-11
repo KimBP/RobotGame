@@ -63,8 +63,11 @@ int main() {
 
 	scheduler.run();
 
+	RobotGame::Viewer::End();
 	RobotGame::Logger::End();
-	// TODO: join logger + viewer
+
+	logger.join();
+	viewer.join();
 
 	return 0;
 }
