@@ -54,6 +54,8 @@ public:
 	static void RobotDataShow(int id, std::string name, int armor, int energy);
 	static void CannonShow(int id, int x1, int y1, int x2, int y2, bool blasted);
 private:
+	static const int maxRobots;
+
 	void DoDie();
 	void _RobotShow(int id, int x, int y);
 	void _RobotDataShow(int id, std::string name, int armor, int energy);
@@ -65,7 +67,7 @@ private:
 	std::mutex eventProcess;
 
 	void SetArenaViewPort();
-	void PrintRobot(unsigned int color, int x, int y);
+	void PrintRobot(int id);
 	void PrintShell(struct ShellPos shell);
 	void ArenaUpdate(int w, int h);
 	void StatusUpdate(int w, int h);

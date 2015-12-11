@@ -11,7 +11,6 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 
-
 namespace RobotGame {
 
 unsigned int Viewer::colors[] = {
@@ -20,6 +19,8 @@ unsigned int Viewer::colors[] = {
 		0xFF00F0FF,
 		0xFF000FFF
 };
+
+const int Viewer::maxRobots = 4;
 
 #define ARENA_WIDTH 1000
 #define ARENA_HEIGHT 1000
@@ -52,6 +53,8 @@ void Viewer::DoDie() {
 
 void Viewer::PostEvent(RobEvent* ev)
 {
+	Logger::Log("Event", ev->getName() + std::string("(") +
+				std::to_string(ev->getId()) + std::string(")"));
 	getViewer().evQueue.enqueue(ev);
 }
 
@@ -89,7 +92,7 @@ void Viewer::RobotShow(int id, int x, int y)
 
 void Viewer::_RobotShow(int id, int x, int y)
 {
-	if (id >= 4)
+	if (id >= maxRobots)
 		return;
 
 	if (! robots.count(id)) {
@@ -149,7 +152,7 @@ void Viewer::Runner()
 		ClearArena();
 
 		for (unsigned int i=0; i < robots.size(); i++) {
-			PrintRobot(robots[i].color, robots[i].x, robots[i].y);
+			PrintRobot(i);
 		}
 		for (unsigned int i=0; i < shells.size(); i++) {
 			PrintShell(shells[i]);
@@ -261,12 +264,12 @@ void Viewer::PrintShell(struct ShellPos shell)
 	}
 }
 
-void Viewer::PrintRobot(unsigned int color, int x, int y)
+void Viewer::PrintRobot(int id)
 {
 #define ROBOT_RADIUS 5
 
 
-	filledCircleColor(gRenderer, x, y, ROBOT_RADIUS, color);
+	filledCircleColor(gRenderer, robots[id].x, robots[id].y, ROBOT_RADIUS, robots[id].color);
 }
 
 void Viewer::SetStatusViewPort()
