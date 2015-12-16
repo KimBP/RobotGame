@@ -15,13 +15,9 @@
 #include "Logger.h"
 #include <thread>
 #include "Viewer.h"
+#include <unistd.h>
 
 #define SIZEOF_ARRAY(arr)       (sizeof(arr) / sizeof(arr[0]))
-
-const char* plugins[] = {
-		"Robots/Scanner/Debug/libScanner.so",
-		"Robots/Runner/Debug/libRunner.so",
-};
 
 extern "C" {
 typedef RobotGame::Robot* ((*getRobotFunc)(RobotGame::RobCtrl* robCtrl));
@@ -45,16 +41,20 @@ getRobotFunc loadPlugin(const char* plugin)
 	return fn;
 }
 
-int main() {
+int main(int argc, char** argv) {
 	std::thread logger(RobotGame::Logger::Start );
 
 	std::thread viewer(RobotGame::Viewer::Start);
 
 	RobotGame::Scheduler& scheduler = RobotGame::Scheduler::getScheduler();
 
+	int c;
+	while ( ( c = ::getopt(argc, argv, "" ) ) != -1 ) {
 
-	for (unsigned int i=0; i< SIZEOF_ARRAY(plugins);i++) {
-		getRobotFunc fn = loadPlugin(plugins[i]);
+	}
+
+	while (--argc) {
+		getRobotFunc fn = loadPlugin(argv[argc]);
 		if (NULL == fn) {
 			exit(1);
 		}
