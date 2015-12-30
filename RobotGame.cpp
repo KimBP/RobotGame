@@ -16,6 +16,7 @@
 #include <thread>
 #include "Viewer.h"
 #include <unistd.h>
+#include "Trigonometry.h"
 
 #define SIZEOF_ARRAY(arr)       (sizeof(arr) / sizeof(arr[0]))
 
@@ -43,6 +44,8 @@ getRobotFunc loadPlugin(const char* plugin)
 
 int main(int argc, char** argv) {
 	std::thread logger(RobotGame::Logger::Start );
+
+	RobotGame::Trigonometry::test();
 
 	std::thread viewer(RobotGame::Viewer::Start);
 
