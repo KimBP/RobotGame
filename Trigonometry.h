@@ -41,6 +41,8 @@ public:
 	/* Converts unity angle (radians) to compass direction */
 	static angle_t unityToCompass(double unityAngle);
 
+	/* Test of functions */
+	static void test();
 };
 
 } /* namespace RobotGame */
