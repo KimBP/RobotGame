@@ -38,6 +38,8 @@ void Runner::run()
 	RobotGame::angle_t direction;
 	RobotGame::armor_t lastArmor = getArmor();
 
+	bool firstTime = true;
+
 	while (1) {
 		if (lastArmor > getArmor()) {
 			RobotGame::Logger::Log(this, std::string("Have been hurt ")+
@@ -56,19 +58,33 @@ void Runner::run()
 									 std::to_string(getSpeed()) +
 									 std::string(" direction: ") +
 									 std::to_string(getDirection()));
-		if (getX() < 1000) {
-			horz = GO_E;
-		} else if (getX() > RobotGame::MAX_POS_X - 1000) {
-			horz = GO_W;
+		if (firstTime) {
+			if (getX() < RobotGame::MAX_POS_X / 2) {
+				horz = GO_E;
+			} else {
+				horz = GO_W;
+			}
+			if (getY() < RobotGame::MAX_POS_Y / 2) {
+				vert = GO_S;
+			} else {
+				vert = GO_N;
+			}
+			firstTime = false;
 		} else {
-			horz = STAY_H;
-		}
-		if (getY() < 1000) {
-			vert = GO_S;
-		} else if (getY() > RobotGame::MAX_POS_Y - 1000) {
-			vert = GO_N;
-		} else {
-			vert = STAY_V;
+			if (getX() < 1000) {
+				horz = GO_E;
+			} else if (getX() > RobotGame::MAX_POS_X - 1000) {
+				horz = GO_W;
+			} else {
+				horz = STAY_H;
+			}
+			if (getY() < 1000) {
+				vert = GO_S;
+			} else if (getY() > RobotGame::MAX_POS_Y - 1000) {
+				vert = GO_N;
+			} else {
+				vert = STAY_V;
+			}
 		}
 
 		switch (vert + horz) {
@@ -101,6 +117,7 @@ void Runner::run()
 			direction = 360; // No change
 			break;
 		}
+
 
 		if (direction < 360) {
 			drive(direction, RobotGame::MAX_SPEED);
