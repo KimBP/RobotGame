@@ -53,34 +53,35 @@ bool Scheduler::addRobot( Robot* (*getRobot)(RobCtrl* robCtrl))
 {
 	Scheduler& inst = getScheduler();
 
-//	const int borderMargin = 100;
-//    const int minDistance =  1000;
+	const int borderMargin = 100;
+    const int minDistance =  1000;
 	int x;
 	int y;
-//	bool retry = true;
-//
-//	do {
-//		retry = false;
-//		x = rand() % (MAX_POS_X - borderMargin) - borderMargin;
-//		y = rand() % (MAX_POS_Y - borderMargin) - borderMargin;
-//
-//		std::vector<RobCtrl*>::iterator robIt;
-//		for (robIt = inst.robots.begin(); robIt != inst.robots.end(); ++robIt) {
-//			unsigned int dist = Trigonometry::distance(x,y, (*robIt)->getX(), (*robIt)->getY());
-//			if (dist < minDistance) {
-//				retry = true;
-//			}
-//		}
-//	} while (retry);
+	bool retry = true;
 
-	if (inst.robots.size() == 0) {
-		x = 150;
-		y = 150;
-	} else
-	{
-		x = 100;
-		y = 100;
-	}
+	do {
+		retry = false;
+		x = rand() % (MAX_POS_X - borderMargin) - borderMargin;
+		y = rand() % (MAX_POS_Y - borderMargin) - borderMargin;
+
+		std::vector<RobCtrl*>::iterator robIt;
+		for (robIt = inst.robots.begin(); robIt != inst.robots.end(); ++robIt) {
+			unsigned int dist = Trigonometry::distance(x,y, (*robIt)->getX(), (*robIt)->getY());
+			if (dist < minDistance) {
+				retry = true;
+			}
+		}
+	} while (retry);
+
+// Use this to start 2 robots at 'known' positions
+//	if (inst.robots.size() == 0) {
+//		x = 150;
+//		y = 150;
+//	} else
+//	{
+//		x = 100;
+//		y = 100;
+//	}
 
 	RobCtrl* robCtrl = new RobCtrl(x,y);
 	Robot* robot = (*getRobot)(robCtrl);
