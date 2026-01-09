@@ -29,7 +29,7 @@ getRobotFunc loadPlugin(const char* plugin)
 	void* lib_handle;
 	lib_handle = dlopen(plugin, RTLD_LAZY);
 	if (!lib_handle) {
-		std::cout << "Error loading plugin " << plugin << std::endl;
+		std::cout << "Error loading plugin " << plugin << " error : " << dlerror() << std::endl;
 		return NULL;
 	}
 
