@@ -1,1 +1,32 @@
-Debug
+# Build outputs
+Debug/
+Release/
+build/
+bin/
+obj/
+out/
+
+# Compiled files
+*.o
+*.so
+*.a
+*.exe
+*.dll
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Log files
+*.log
+
+# Environment files
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
