@@ -39,4 +39,8 @@ Modular CMake structure with subdirectories for robot plugins; Hidden symbol vis
 
 Constitution supersedes all coding guidelines and architectural decisions; Amendments require unanimous approval from core maintainers; All pull requests must validate compliance via automated constitution checks; Complexity increases must be justified with performance or maintainability benefits; Technical debt must be documented and scheduled for resolution
 
+Scripts must not use 'heredocs'
+
+Files must not be duplicated in the repo.
+
 **Version**: 1.0.0 | **Ratified**: 2025-01-09 | **Last Amended**: 2025-01-09
