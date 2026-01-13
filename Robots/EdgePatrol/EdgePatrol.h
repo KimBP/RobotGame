@@ -20,7 +20,7 @@ public:
 
 	virtual struct tune_t init(std::string& name);
 	virtual void run();
-	virtual std::string name() const;
+	virtual std::string name() const { return myName; };
 
 private:
 	// Patrol state enumeration
