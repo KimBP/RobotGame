@@ -115,7 +115,7 @@ void Trigonometry::move(int x, int y,
 		direction += 180;
 		direction = compassUnify(direction);
 	}
-	move(x,y, direction, abs(distance), newX, newY);
+	move(x,y, direction, distance, newX, newY);
 }
 
 void Trigonometry::test()
