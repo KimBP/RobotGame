@@ -8,10 +8,15 @@ out/
 
 # Compiled files
 *.o
-*.so
 *.a
+*.so
 *.exe
 *.dll
+
+# CMake build artifacts
+build/
+CMakeCache.txt
+cmake_install.cmake
 
 # IDE files
 .idea/

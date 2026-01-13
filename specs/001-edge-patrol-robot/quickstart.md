@@ -76,54 +76,42 @@ RobotGame.GLM-4.7/
 
 ## Building Edge Patrol Robot
 
-### Option 1: Command Line Build (Recommended)
+### CMake Build (Recommended)
 
-Create a Makefile in `Robots/EdgePatrol/` directory:
+**Build all robots and main executable**:
 
-**File**: `Robots/EdgePatrol/Makefile`
-
-```makefile
-# Makefile for Edge Patrol Robot
-CXX = g++
-CXXFLAGS = -std=c++11 -fPIC -I../../
-LDFLAGS = -shared -ldl
-
-# Source files
-SRC = EdgePatrol.cpp
-OBJ = $(SRC:.cpp=.o)
-TARGET = EdgePatrol.so
-
-# Build rules
-all: $(TARGET)
-
-$(TARGET): $(OBJ)
-	$(CXX) $(LDFLAGS) -o $@ $^
-
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-clean:
-	rm -f $(OBJ) $(TARGET)
-
-.PHONY: all clean
-```
-
-**Build Commands**:
 ```bash
-cd Robots/EdgePatrol
-make clean
+mkdir -p build && cd build
+cmake ..
 make
 ```
 
 **Expected Output**:
 ```
-g++ -std=c++11 -fPIC -I../../ -c EdgePatrol.cpp -o EdgePatrol.o
-g++ -shared -ldl -o EdgePatrol.so EdgePatrol.o
+Building CXX objects...
+Linking CXX executable robot-arena
+Linking CXX shared library libedgepatrol.so
+Linking CXX shared library librunner.so
+Linking CXX shared library libscanner.so
+Built targets: robot-arena, edgepatrol, runner, scanner
 ```
 
----
+**Build specific robot**:
 
-### Option 2: Eclipse CDT Build
+```bash
+cd build
+make edgepatrol
+make runner
+make scanner
+```
+
+**Generated Files**:
+- `build/robot-arena` - Main executable
+- `build/Robots/libedgepatrol.so` - Edge Patrol robot plugin
+- `build/Robots/librunner.so` - Runner robot plugin
+- `build/Robots/libscanner.so` - Scanner robot plugin
+
+### Alternative: Eclipse CDT Build
 
 If using Eclipse IDE:
 
