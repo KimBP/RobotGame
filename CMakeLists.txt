@@ -26,9 +26,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	SDL2::SDL2
 	SDL2_image::SDL2_image
 	SDL2_ttf::SDL2_ttf
-add_subdirectory(Robots/EdgePatrol)
+	${SDL2_GFX_LIBRARIES}
 )
 
+add_subdirectory(Robots/EdgePatrol)
 add_subdirectory(Robots/Runner)
 add_subdirectory(Robots/Scanner)
 

@@ -12,14 +12,10 @@
 
 extern "C" RobotGame::Robot* getRobot(RobotGame::RobCtrl* robCtrl)
 {
-	static EdgePatrol* instance = new EdgePatrol(robCtrl);
+	static RobotGame::EdgePatrol* instance = new RobotGame::EdgePatrol(robCtrl);
 	return instance;
 }
 
-const precision_t RobotGame::EdgePatrol::detectionAngle = 10;
-const range_t RobotGame::EdgePatrol::detectionRange = 6000;
-const range_t RobotGame::EdgePatrol::edgeDistance = 800;
-const range_t RobotGame::EdgePatrol::cornerThreshold = 500;
 const struct RobotGame::tune_t RobotGame::EdgePatrol::myTune = {1, 1};
 const std::string RobotGame::EdgePatrol::myName("EdgePatrol");
 
@@ -47,31 +43,31 @@ void RobotGame::EdgePatrol::run()
 	int centerX = RobotGame::MAX_POS_X / 2;
 	int centerY = RobotGame::MAX_POS_Y / 2;
 
-#define STAY_H 	0
-#define STAY_V 	0
-#define GO_N	1
-#define GO_S	2
-#define GO_W	4
-#define GO_E	8
+#define STAY_H  0
+#define STAY_V  0
+#define GO_N   1
+#define GO_S   2
+#define GO_W   4
+#define GO_E   8
 
 	int horz, vert;
 	angle_t direction;
 
 	while (1) {
 		if (lastArmor > getArmor()) {
-			RobotGame::Logger::Log(this, std::string("Have been hurt ")+
+			RobotGame::Logger::Log(this, std::string("Have been hurt ") +
 										 std::to_string(lastArmor) +
-										 std::string(" -> ")+
+										 std::string(" -> ") +
 										 std::to_string(getArmor()));
 			lastArmor = getArmor();
 		}
 
-		RobotGame::Logger::Log(this, std::string("Current position(")+
-										 std::to_string(getX())+
-										 std::string(",")+
-										 std::to_string(getY())+
+		RobotGame::Logger::Log(this, std::string("Current position(") +
+										 std::to_string(getX()) +
+										 std::string(",") +
+										 std::to_string(getY()) +
 										 std::string(")"));
-		RobotGame::Logger::Log(this, std::string("Current speed: ")+
+		RobotGame::Logger::Log(this, std::string("Current speed: ") +
 										 std::to_string(getSpeed()) +
 										 std::string(" direction: ") +
 										 std::to_string(getDirection()));
@@ -199,3 +195,4 @@ void RobotGame::EdgePatrol::run()
 
 		skip();
 	}
+}

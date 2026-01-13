@@ -8,7 +8,7 @@
 #ifndef EDGEPATROL_H_
 #define EDGEPATROL_H_
 
-#include <Robot.h>
+#include "Robot.h"
 #include <string>
 
 namespace RobotGame {
@@ -48,13 +48,13 @@ private:
 	int shotsInAir;
 
 	// Configuration parameters (compile-time defaults)
-	static const precision_t detectionAngle = 10;
-	static const range_t detectionRange = 6000;
-	static const range_t edgeDistance = 800;
-	static const range_t cornerThreshold = 500;
+	static const RobotGame::precision_t detectionAngle = 10;
+	static const RobotGame::range_t detectionRange = 6000;
+	static const RobotGame::range_t edgeDistance = 800;
+	static const RobotGame::range_t cornerThreshold = 500;
 
 	// Static tuning configuration
-	static const struct tune_t myTune;
+	static const struct RobotGame::tune_t myTune;
 	static const std::string myName;
 };
 
