@@ -31,6 +31,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 add_subdirectory(Robots/Runner)
 add_subdirectory(Robots/Scanner)
+add_subdirectory(Robots/EdgeRobot)
 
 # 4. Ensure compile_commands.json is generated 
 # (Crucial for clang-uml to work correctly)
