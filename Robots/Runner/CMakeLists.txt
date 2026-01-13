@@ -10,3 +10,6 @@ add_library(runner SHARED Runner.cpp)
 target_include_directories(runner PRIVATE 
 	${CMAKE_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR})
+
+# Link only for vtable/RTTI symbols - standalone compilation works
+target_link_libraries(runner PRIVATE robot-core)

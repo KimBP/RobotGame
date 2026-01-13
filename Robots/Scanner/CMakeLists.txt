@@ -10,3 +10,6 @@ add_library(scanner SHARED Scanner.cpp)
 target_include_directories(scanner PRIVATE 
 	${CMAKE_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR})
+
+# Link only for vtable/RTTI symbols - standalone compilation works
+target_link_libraries(scanner PRIVATE robot-core)

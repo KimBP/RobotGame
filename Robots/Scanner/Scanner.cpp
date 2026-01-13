@@ -10,7 +10,7 @@
 
 
 
-extern "C" RobotGame::Robot* getRobot(RobotGame::RobCtrl* robCtrl)
+extern "C" __attribute__((visibility("default"))) RobotGame::Robot* getRobot(RobotGame::RobCtrl* robCtrl)
 {
 	static Scanner* instance = new Scanner(robCtrl);
 	return instance;

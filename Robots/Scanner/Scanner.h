@@ -8,7 +8,7 @@
 #ifndef SCANNER_H_
 #define SCANNER_H_
 
-#include <Robot.h>
+#include "Robot.h"
 
 class Scanner: public RobotGame::Robot {
 public:
