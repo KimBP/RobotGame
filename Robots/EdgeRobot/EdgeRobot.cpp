@@ -10,7 +10,7 @@
 
 namespace RobotGame {
 
-extern "C" Robot* getRobot(RobCtrl* robCtrl) {
+extern "C" __attribute__((visibility("default"))) Robot* getRobot(RobCtrl* robCtrl) {
     static EdgeRobot* instance = new EdgeRobot(robCtrl);
     return instance;
     // Factory function for dynamic loading complete
