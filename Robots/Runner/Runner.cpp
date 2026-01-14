@@ -52,6 +52,11 @@ void Runner::run()
 										 std::to_string(getArmor()));
 			lastArmor = getArmor();
 		}
+		else if (lastArmor < getArmor()) {
+			// Armor was repaired or enhanced
+			lastArmor = getArmor();
+			doEscape = false;
+		}
 
 		RobotGame::Logger::Log(this, std::string("Current position(")+
 									 std::to_string(getX())+
