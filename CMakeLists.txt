@@ -23,6 +23,8 @@ add_library(robot-engine STATIC
     "Scheduler.cpp"
     "Trigonometry.cpp"
     "Viewer.cpp"
+    "Explosion.cpp"
+    "ShellPool.cpp"
 )
 
 # Export Robot class symbols from robot-core
