@@ -43,21 +43,52 @@ getRobotFunc loadPlugin(const char* plugin)
 }
 
 int main(int argc, char** argv) {
-	std::thread logger(RobotGame::Logger::Start );
-
-	RobotGame::Trigonometry::test();
-
-	std::thread viewer(RobotGame::Viewer::Start);
-
-	RobotGame::Scheduler& scheduler = RobotGame::Scheduler::getScheduler();
-
-	int c;
-	while ( ( c = ::getopt(argc, argv, "" ) ) != -1 ) {
-
+	// Default battle delay: 16ms (60 FPS)
+	int battleDelayMs = 16;
+	
+	// Parse command-line arguments and collect robot plugins
+	std::vector<std::string> robotPlugins;
+	for (int i = 1; i < argc; i++) {
+		std::string arg = argv[i];
+		
+		if (arg == "--help" || arg == "-h") {
+			std::cout << "Usage: " << argv[0] << " [options] robot1.so [robot2.so ...]\n"
+					  << "Options:\n"
+					  << "  -d, --delay <ms>    Battle delay in milliseconds (1-1000, default: 16)\n"
+					  << "  -h, --help          Show this help message\n";
+			return 0;
+		}
+		else if ((arg == "--delay" || arg == "-d") && i + 1 < argc) {
+			try {
+				battleDelayMs = std::stoi(argv[++i]);
+				if (battleDelayMs < 1 || battleDelayMs > 1000) {
+					std::cerr << "Error: Delay must be between 1 and 1000 milliseconds" << std::endl;
+					return 1;
+				}
+				std::cout << "Battle delay set to " << battleDelayMs << "ms" << std::endl;
+			} catch (const std::exception& e) {
+				std::cerr << "Error: Invalid delay value" << std::endl;
+				return 1;
+			}
+		}
+		else {
+			// This is a robot plugin
+			robotPlugins.push_back(arg);
+		}
 	}
 
-	while (--argc) {
-		getRobotFunc fn = loadPlugin(argv[argc]);
+std::thread logger(RobotGame::Logger::Start );
+	
+	RobotGame::Trigonometry::test();
+	
+	std::thread viewer(RobotGame::Viewer::Start);
+	
+	RobotGame::Scheduler& scheduler = RobotGame::Scheduler::getScheduler();
+	scheduler.setBattleDelay(battleDelayMs);
+	
+	// Load robot plugins
+	for (const auto& plugin : robotPlugins) {
+		getRobotFunc fn = loadPlugin(plugin.c_str());
 		if (NULL == fn) {
 			exit(1);
 		}
