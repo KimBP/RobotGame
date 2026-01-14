@@ -15,6 +15,8 @@
 #include <mutex>
 #include <string>
 #include <SDL2/SDL_ttf.h>
+#include "Vector2.h"
+#include "ShellPool.h"
 
 namespace RobotGame {
 
@@ -68,13 +70,20 @@ private:
 
 	void SetArenaViewPort();
 	void PrintRobot(int id);
-	void PrintShell(struct ShellPos shell);
+	// void PrintShell(struct ShellPos shell); // DEPRECATED - replaced with animation system
 	void ArenaUpdate(int w, int h);
 	void StatusUpdate(int w, int h);
-
+	
 	void SetStatusViewPort();
 	void ClearStatus();
 	void PrintRobotStatus(int id);
+	
+	// NEW: Animation and rendering system declarations
+	SDL_Renderer* createRendererWithVSyncFallback(SDL_Window* window);
+	void initializeRenderLayers();
+	void renderFrameWithLayers();
+	void createExplosionEffect(int x, int y);
+	void updateExplosionEffects();
 
 	bool goDie;
 	SDL_Window* gWindow;
@@ -85,7 +94,13 @@ private:
 
 	SafeQueue<RobEvent*> evQueue;
 	std::map<int, struct RobPos> robots;
-	std::vector<struct ShellPos> shells;
+	// std::vector<struct ShellPos> shells; // Replaced with animation system
+	
+	// NEW: Animation system members
+	SDL_Texture* terrainLayer;
+	SDL_Texture* robotLayer;
+	SDL_Texture* explosionLayer;
+	ShellPool* shellPool;
 };
 
 } /* namespace RobotGame */
