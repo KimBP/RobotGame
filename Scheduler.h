@@ -14,6 +14,7 @@
 #include "CannonShell.h"
 #include <thread>
 #include <mutex>
+#include <chrono>
 
 namespace RobotGame {
 
@@ -24,6 +25,10 @@ public:
 	static bool addRobot( Robot* (*getRobot)(RobCtrl* robCtrl));
 	static RobCtrl* iterateRobots(RobCtrl* prev);
 	static void end();
+	void setBattleDelay(int delayMs);
+	int getBattleDelay() const;
+	void run();
+	const unsigned int getTick() { return tick;}
 
 private:
 	Scheduler() :
@@ -31,11 +36,6 @@ private:
 	virtual ~Scheduler();
 	Scheduler(Scheduler const&) = delete;      // No copy
 	void operator=(Scheduler const&) = delete; // No assignment
-
-public:
-	void run();
-
-	const unsigned int getTick() { return tick;};
 
 private:
 	void tickEnd();
@@ -46,6 +46,7 @@ private:
 
 	unsigned int robCnt;
 	unsigned int tick;
+	int battleDelayMs = 16; // Default 16ms (60 FPS)
 	std::mutex schedulerMtx;
 };
 

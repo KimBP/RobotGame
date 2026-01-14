@@ -139,6 +139,8 @@ void Scheduler::tickEnd()
 		robCtrl = iterateRobots(robCtrl);
 	}
 
+	std::this_thread::sleep_for(std::chrono::milliseconds(battleDelayMs));
+
 	Viewer::tick(tick);
 	schedulerMtx.lock(); // Wait for frame update
 
@@ -159,8 +161,6 @@ void Scheduler::tickEnd()
 			),
 			robots.end()
 	);
-
-	//std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 void Scheduler::run()
@@ -189,7 +189,23 @@ void Scheduler::run()
 		threads.pop_back();
 	}
 
+}
 
+void Scheduler::setBattleDelay(int delayMs) {
+	// Validate input range (1-1000ms)
+	if (delayMs < 1 || delayMs > 1000) {
+		// Use default (16ms) if invalid
+		battleDelayMs = 16;
+		// Log warning for invalid values
+		Logger::LogHead("Warning: Invalid battle delay " + std::to_string(delayMs) + 
+					   "ms, using default 16ms");
+	} else {
+		battleDelayMs = delayMs;
+	}
+}
+
+int Scheduler::getBattleDelay() const {
+	return battleDelayMs;
 }
 
 } /* namespace RobotGame */
