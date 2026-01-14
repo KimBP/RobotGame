@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2026-01-12
 
 ## Active Technologies
+- C++17 (from existing codebase) + SDL2, SDL2_ttf, SDL2_gfx, SDL2_image (from CMake configuration) (001-graphics-fixes)
+- N/A (real-time game with in-memory state) (001-graphics-fixes)
 
 - C++17 + SDL2, SDL2_ttf, SDL2_gfx, SDL2_image (001-edge-robot)
 
@@ -55,6 +57,7 @@ rm -rf build/
 C++11: Follow standard conventions
 
 ## Recent Changes
+- 001-graphics-fixes: Added C++17 (from existing codebase) + SDL2, SDL2_ttf, SDL2_gfx, SDL2_image (from CMake configuration)
 
 - 001-edge-robot: Added C++17 + SDL2, SDL2_ttf, SDL2_gfx, SDL2_image (CMake-based build system)
 
