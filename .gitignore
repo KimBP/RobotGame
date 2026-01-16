@@ -1,4 +1,8 @@
-build
-Debug
+build/
+
+# Log files
+*.log
+
+# AI Agent files
 .opencode
 

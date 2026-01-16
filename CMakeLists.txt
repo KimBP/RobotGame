@@ -22,13 +22,21 @@ find_package(SDL2_ttf  REQUIRED CONFIG)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SDL2_GFX REQUIRED SDL2_gfx)
 
+# 4. Export symbols for dynamic plugin loading
+# Required so robot plugins can resolve Robot base class symbols at runtime
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    LINK_FLAGS "-rdynamic"
+)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE 
 	SDL2::SDL2
 	SDL2_image::SDL2_image
 	SDL2_ttf::SDL2_ttf
 	${SDL2_GFX_LIBRARIES}
+	dl
 )
 
+add_subdirectory(Robots/EdgePatrol)
 add_subdirectory(Robots/Runner)
 add_subdirectory(Robots/Scanner)
 
