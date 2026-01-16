@@ -106,7 +106,7 @@ public:
 
 
 /* A 'factory' function returning the Robot singleton */
-extern "C" Robot* getRobot(RobCtrl* robCtrl);
+extern "C" __attribute__((visibility("default"))) Robot* getRobot(RobCtrl* robCtrl);
 
 } /* namespace RobotGame */
 #endif /* ROBOT_H_ */

@@ -8,8 +8,9 @@
 #include "Runner.h"
 #include "Logger.h"
 #include <cstdlib>
+#include <ctime>
 
-extern "C" RobotGame::Robot* getRobot(RobotGame::RobCtrl* robCtrl)
+extern "C" __attribute__((visibility("default"))) RobotGame::Robot* getRobot(RobotGame::RobCtrl* robCtrl)
 {
 	static Runner* instance = new Runner(robCtrl);
 	return instance;
@@ -50,6 +51,11 @@ void Runner::run()
 										 std::string(" -> ")+
 										 std::to_string(getArmor()));
 			lastArmor = getArmor();
+		}
+		else if (lastArmor < getArmor()) {
+			// Armor was repaired or enhanced
+			lastArmor = getArmor();
+			doEscape = false;
 		}
 
 		RobotGame::Logger::Log(this, std::string("Current position(")+

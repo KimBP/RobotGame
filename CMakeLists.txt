@@ -5,7 +5,9 @@ project(robot-arena VERSION 1.0 LANGUAGES CXX)
 
 # Standard C++ version
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# (Crucial for clang-uml to work correctly)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # 1. Gather all .cpp files in the current directory
 file(GLOB SOURCES "*.cpp")
@@ -36,10 +38,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	dl
 )
 
-add_subdirectory(Robots/EdgePatrol)
 add_subdirectory(Robots/Runner)
 add_subdirectory(Robots/Scanner)
-
-# 4. Ensure compile_commands.json is generated 
-# (Crucial for clang-uml to work correctly)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+add_subdirectory(Robots/EdgePatrol)
+add_subdirectory(Robots/EdgeRobot)

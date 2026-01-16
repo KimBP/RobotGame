@@ -94,7 +94,6 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T015 [US1] Add CMakeLists.txt for plugin in Robots/[PluginName]/
 - [ ] T016 [US1] Test plugin loading with main executable
 - [ ] T017 [US1] Add logging for robot behavior debugging
-
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
 ---
