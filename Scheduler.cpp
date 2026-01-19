@@ -6,10 +6,11 @@
  */
 
 #include "Scheduler.h"
-#include "Trigonometry.h"
 #include <algorithm>
-#include <utility>
-#include <iostream>
+#include <math.h>
+#include <stdlib.h>
+#include "Trigonometry.h"
+#include <string>
 #include "Logger.h"
 #include "Viewer.h"
 #include "RobotPosEvent.h"
@@ -120,11 +121,23 @@ void Scheduler::tickEnd()
 	/* Iterate over all robots and update everything */
 	robCtrl = iterateRobots(0);
 	int id = 0;
+	std::vector<int> deadRobots;
 	while (0 != robCtrl) {
-		robCtrl->tick(tick);
-		Viewer::PostEvent(new RobotPosEvent(id, robCtrl->getX(), robCtrl->getY()));
+		bool stillAlive = robCtrl->tick(tick);
+		if (stillAlive) {
+			Viewer::PostEvent(new RobotPosEvent(id, robCtrl->getX(), robCtrl->getY()));
+		} else {
+			// Robot died - schedule for cleanup
+			deadRobots.push_back(id);
+			Logger::LogDebug(std::string("Robot ") + std::to_string(id) + std::string(" died, scheduling cleanup"));
+		}
 		id++;
 		robCtrl = iterateRobots(robCtrl);
+	}
+	
+	// Clean up dead robots
+	for (int deadId : deadRobots) {
+		Viewer::cleanupRobotTextures(deadId);
 	}
 
 	CannonShell::tick(tick);
