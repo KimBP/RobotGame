@@ -9,6 +9,17 @@ set(CMAKE_CXX_STANDARD 17)
 # (Crucial for clang-uml to work correctly)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# DEBUG: Enhanced logging configuration
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(-DDEBUG_MODE=1)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -Wall -Wextra")
+    message(STATUS "Debug build with enhanced logging enabled")
+else()
+    add_compile_definitions(-DDEBUG_MODE=0)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
+    message(STATUS "Release build")
+endif()
+
 # 1. Gather all .cpp files in the current directory
 file(GLOB SOURCES "*.cpp")
 

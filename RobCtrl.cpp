@@ -263,16 +263,38 @@ bool RobCtrl::tick(unsigned int tick)
 		}
 		if (wallhit) {
 			armor_t damage = (currSpeed * 2) / 10;
+			armor_t oldArmor = currArmor;
 			currArmor -= std::min(damage, currArmor);
+			Logger::LogDebug(std::string("DEBUG [") + name + std::string("] wall hit - damage=") + 
+								  std::to_string(damage) + std::string(", armor: ") + 
+								  std::to_string(oldArmor) + std::string(" -> ") + std::to_string(currArmor));
 		}
 	}
+
+	// Defensive check: Ensure armor never goes negative
+	if (currArmor < 0) {
+		Logger::LogError(std::string("ERROR [") + name + std::string("] Negative armor detected: ") + 
+						std::to_string(currArmor) + std::string(" - clamping to 0"));
+		currArmor = 0;
+	}
+
+	// DEBUG: Log armor state before death check
+	Logger::LogDebug(std::string("DEBUG [") + name + std::string("] tick() - Before death check: armor=") + 
+					  std::to_string(currArmor) + std::string(", >0? ") + 
+					  (currArmor > 0 ? "YES" : "NO"));
 
 	if (currArmor > 0) {
 		currEnergy += ENERGY_FILLUP;
 		if (currEnergy > MAX_ENERGY)
 			currEnergy = MAX_ENERGY;
+		Logger::LogDebug(std::string("DEBUG [") + name + std::string("] tick() - Alive: refilling energy to ") + 
+						  std::to_string(currEnergy));
 		return true;
 	}
+	
+	// Robot death detected - set death flag and prepare cleanup
+	Logger::LogDebug(std::string("DEBUG [") + name + std::string("] tick() - DEAD: returning false"));
+	goDie = true;
 	return false;
 }
 

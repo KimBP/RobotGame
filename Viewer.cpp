@@ -138,23 +138,117 @@ void Viewer::_RobotDataShow(int id, std::string name, int armor, int energy)
 			static_cast<Uint8>((robots[id].color >> 8) & 0xff),
 			static_cast<Uint8>((robots[id].color >> 0) & 0xff)
 	};
+	// Enhanced texture creation with defensive programming
 	if (!robots[id].nameTexture) {
-		SDL_Surface* surface = TTF_RenderText_Solid( gFont, name.c_str(), col );
+		// Check if font is available before trying to render text
+		if (!gFont) {
+			Logger::LogError("Cannot create robot textures: No font loaded");
+			// Set robot data without textures
+			robots[id].armor = armor;
+			robots[id].energy = energy;
+			return;
+		}
+		
+		// Create name texture
+		SDL_Surface* surface = TTF_RenderText_Solid(gFont, name.c_str(), col);
+		if (!surface) {
+			Logger::LogError(std::string("Failed to create name surface: ") + std::string(TTF_GetError()));
+		} else {
+			robots[id].nameTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
+			if (!robots[id].nameTexture) {
+				Logger::LogError(std::string("Failed to create name texture: ") + std::string(SDL_GetError()));
+			}
+			SDL_FreeSurface(surface);
+		}
 
-		robots[id].nameTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
-		SDL_FreeSurface(surface);
+		// Create energy texture
+		surface = TTF_RenderText_Solid(gFont, "E: ", col);
+		if (!surface) {
+			Logger::LogError(std::string("Failed to create energy surface: ") + std::string(TTF_GetError()));
+		} else {
+			robots[id].energyTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
+			if (!robots[id].energyTexture) {
+				Logger::LogError(std::string("Failed to create energy texture: ") + std::string(SDL_GetError()));
+			}
+			SDL_FreeSurface(surface);
+		}
 
-		surface = TTF_RenderText_Solid( gFont, "E: ", col);
-		robots[id].energyTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
-		SDL_FreeSurface(surface);
-
-		surface = TTF_RenderText_Solid( gFont, "A: ", col);
-		robots[id].armorTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
-		SDL_FreeSurface(surface);
-
+		// Create armor texture
+		surface = TTF_RenderText_Solid(gFont, "A: ", col);
+		if (!surface) {
+			Logger::LogError(std::string("Failed to create armor surface: ") + std::string(TTF_GetError()));
+		} else {
+			robots[id].armorTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
+			if (!robots[id].armorTexture) {
+				Logger::LogError(std::string("Failed to create armor texture: ") + std::string(SDL_GetError()));
+			}
+			SDL_FreeSurface(surface);
+		}
 	}
 	robots[id].armor = armor;
 	robots[id].energy = energy;
+}
+
+void Viewer::cleanupRobotTextures(int id) {
+	Viewer& viewer = getViewer();
+	auto it = viewer.robots.find(id);
+	if (it != viewer.robots.end()) {
+		// Clean up SDL textures to prevent memory leaks
+		if (it->second.nameTexture) {
+			SDL_DestroyTexture(it->second.nameTexture);
+			it->second.nameTexture = nullptr;
+			Logger::LogDebug(std::string("Cleaned up name texture for robot ") + std::to_string(id));
+		}
+		if (it->second.energyTexture) {
+			SDL_DestroyTexture(it->second.energyTexture);
+			it->second.energyTexture = nullptr;
+			Logger::LogDebug(std::string("Cleaned up energy texture for robot ") + std::to_string(id));
+		}
+		if (it->second.armorTexture) {
+			SDL_DestroyTexture(it->second.armorTexture);
+			it->second.armorTexture = nullptr;
+			Logger::LogDebug(std::string("Cleaned up armor texture for robot ") + std::to_string(id));
+		}
+		
+		// Remove robot from the map
+		viewer.robots.erase(it);
+		Logger::LogDebug(std::string("Removed dead robot ") + std::to_string(id) + std::string(" from viewer"));
+	}
+}
+
+void Viewer::drawArenaBorder() {
+	if (!gRenderer) {
+		Logger::LogError("Cannot draw arena border: No renderer available");
+		return;
+	}
+	
+	// Set border color (white)
+	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+	
+	// Define border thickness
+	const int borderThickness = 3;
+	
+	// Draw top border
+	for (int i = 0; i < borderThickness; i++) {
+		SDL_RenderDrawLine(gRenderer, 0, i, ARENA_WIDTH, i);
+	}
+	
+	// Draw bottom border
+	for (int i = 0; i < borderThickness; i++) {
+		SDL_RenderDrawLine(gRenderer, 0, ARENA_HEIGHT - i, ARENA_WIDTH, ARENA_HEIGHT - i);
+	}
+	
+	// Draw left border
+	for (int i = 0; i < borderThickness; i++) {
+		SDL_RenderDrawLine(gRenderer, i, 0, i, ARENA_HEIGHT);
+	}
+	
+	// Draw right border
+	for (int i = 0; i < borderThickness; i++) {
+		SDL_RenderDrawLine(gRenderer, ARENA_WIDTH - i, 0, ARENA_WIDTH - i, ARENA_HEIGHT);
+	}
+	
+	Logger::LogDebug("Arena border drawn successfully");
 }
 
 void Viewer::Runner()
@@ -264,9 +358,48 @@ Viewer::Viewer()
 		return;
 	}
 
-	// font handling
-	TTF_Init();
-	gFont = TTF_OpenFont( "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf", 18 );
+	// Enhanced font handling with proper error checking
+	if (TTF_Init() == -1) {
+		Logger::LogError(std::string("TTF_Init failed: ") + std::string(TTF_GetError()));
+		return;
+	}
+
+	// List of fallback fonts to try
+	const char* fontPaths[] = {
+		"/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
+		"/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+		"/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+		"/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
+		"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
+		"/System/Library/Fonts/Arial.ttf",  // macOS fallback
+		"C:/Windows/Fonts/arial.ttf"       // Windows fallback
+	};
+	
+	const int numFontPaths = sizeof(fontPaths) / sizeof(fontPaths[0]);
+	
+	for (int i = 0; i < numFontPaths; i++) {
+		// Check if font file exists before trying to load it
+		FILE* fontFile = fopen(fontPaths[i], "r");
+		if (fontFile) {
+			fclose(fontFile);
+			gFont = TTF_OpenFont(fontPaths[i], 18);
+			if (gFont) {
+				Logger::LogDebug(std::string("Font loaded successfully: ") + fontPaths[i]);
+				break;
+			} else {
+				Logger::LogDebug(std::string("Font exists but failed to load: ") + fontPaths[i] + 
+								std::string(" - ") + TTF_GetError());
+			}
+		} else {
+			Logger::LogDebug(std::string("Font file not found: ") + fontPaths[i]);
+		}
+	}
+	
+	if (!gFont) {
+		Logger::LogError(std::string("Failed to load any font: ") + std::string(TTF_GetError()));
+		Logger::LogError("Game will continue without text rendering");
+	}
 
 	// Initialize animation system
 	shellPool = new ShellPool();
@@ -542,6 +675,9 @@ void Viewer::renderFrameWithLayers() {
 	SDL_RenderCopy(gRenderer, terrainLayer, nullptr, &renderRect);
 	SDL_RenderCopy(gRenderer, robotLayer, nullptr, &renderRect);
 	SDL_RenderCopy(gRenderer, explosionLayer, nullptr, &renderRect);
+	
+	// Draw arena border on top of everything
+	drawArenaBorder();
 	
 	// Render shells directly (they use their own rendering system)
 	shellPool->renderShells(gRenderer);

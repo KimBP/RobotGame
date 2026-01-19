@@ -55,7 +55,9 @@ public:
 	static void RobotShow(int id, int x, int y);
 	static void RobotDataShow(int id, std::string name, int armor, int energy);
 	static void CannonShow(int id, int x1, int y1, int x2, int y2, bool blasted);
-private:
+	static void cleanupRobotTextures(int id);
+	void drawArenaBorder();
+ private:
 	static const int maxRobots;
 
 	void DoDie();
