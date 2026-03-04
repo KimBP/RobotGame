@@ -18,16 +18,9 @@
 
 namespace RobotGame {
 
-Trigonometry::Trigonometry() {
-	// TODO Auto-generated constructor stub
+namespace Trigonometry {
 
-}
-
-Trigonometry::~Trigonometry() {
-	// TODO Auto-generated destructor stub
-}
-
-angle_t Trigonometry::compassUnify(angle_t direction)
+angle_t compassUnify(angle_t direction)
 {
 	while (direction < 0) {
 		direction += 360;
@@ -37,7 +30,7 @@ angle_t Trigonometry::compassUnify(angle_t direction)
 
 static const double  PI = 3.14159265;
 
-double Trigonometry::compassToUnity(angle_t direction)
+double compassToUnity(angle_t direction)
 {
 	direction = compassUnify(direction);
 	double unityAngle = compassUnify(-direction + 90); // Convert from compass to unity circle angles
@@ -46,7 +39,7 @@ double Trigonometry::compassToUnity(angle_t direction)
 	return unityAngle;
 }
 
-angle_t Trigonometry::unityToCompass(double unityAngle)
+	angle_t unityToCompass(double unityAngle)
 {
 	double direction = round(unityAngle * 180.0 / PI);
 	direction = -direction + 90;
@@ -54,7 +47,7 @@ angle_t Trigonometry::unityToCompass(double unityAngle)
 }
 
 
-angle_t Trigonometry::direction(int x1, int y1, int x2, int y2)
+angle_t direction(int x1, int y1, int x2, int y2)
 {
 
 	double dx = x2-x1;
@@ -81,7 +74,7 @@ angle_t Trigonometry::direction(int x1, int y1, int x2, int y2)
 	}
 }
 
-range_t Trigonometry::distance(int x1, int y1, int x2, int y2)
+range_t distance(int x1, int y1, int x2, int y2)
 {
 
 	double dx = x2-x1;
@@ -93,7 +86,7 @@ range_t Trigonometry::distance(int x1, int y1, int x2, int y2)
 }
 
 
-void Trigonometry::move(int x, int y,
+void move(int x, int y,
 		angle_t direction, range_t distance,
 		int* newX, int* newY)
 {
@@ -106,7 +99,7 @@ void Trigonometry::move(int x, int y,
 	*newY = y - deltaY; // Y - axis reverted compared to unity circle
 }
 
-void Trigonometry::move(int x, int y,
+void move(int x, int y,
 				angle_t direction, speed_t speed, unsigned int ticks,
 				int* newX, int* newY)
 {
@@ -118,7 +111,7 @@ void Trigonometry::move(int x, int y,
 	move(x,y, direction, distance, newX, newY);
 }
 
-void Trigonometry::test()
+void test()
 {
 	/* Test of compass unify */
 	const struct {
@@ -230,5 +223,7 @@ void Trigonometry::test()
 
 
 }
+
+} /* namespace Trigonometry */
 
 } /* namespace RobotGame */
