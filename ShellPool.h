@@ -24,12 +24,14 @@ struct AnimatedShell {
     Vector2 velocity;
     bool active;
     uint32_t creationTime;
+    uint32_t ownerColor;
     std::array<TrailPoint, 20> trail;
     uint32_t trailIndex;
     uint32_t trailCount;
     
-    AnimatedShell() : shellId(0), position(0, 0), velocity(0, 0), 
-                      active(false), creationTime(0), trailIndex(0), trailCount(0) {
+    AnimatedShell() : shellId(0), position(0, 0), velocity(0, 0),
+                      active(false), creationTime(0), ownerColor(0xFFFFFFFF),
+                      trailIndex(0), trailCount(0) {
         trail.fill(TrailPoint());
     }
     
@@ -71,7 +73,7 @@ public:
     
     ShellPool();
     
-    uint32_t createShell(const Vector2& position, const Vector2& velocity, uint32_t currentTime);
+    uint32_t createShell(const Vector2& position, const Vector2& velocity, uint32_t currentTime, uint32_t ownerColor = 0xFFFFFFFF);
     bool destroyShell(uint32_t shellId);
     AnimatedShell* getShell(uint32_t shellId);
     void updateShells(uint32_t currentTime);
