@@ -135,9 +135,9 @@ void Scheduler::tickEnd()
 		robCtrl = iterateRobots(robCtrl);
 	}
 	
-	// Clean up dead robots
+	// Mark dead robots (keep them visible at 50% opacity)
 	for (int deadId : deadRobots) {
-		Viewer::cleanupRobotTextures(deadId);
+		Viewer::markRobotDead(deadId);
 	}
 
 	CannonShell::tick(tick);

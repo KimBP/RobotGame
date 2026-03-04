@@ -28,12 +28,14 @@ private:
 		unsigned int color;
 		int energy;
 		int armor;
+		bool isDead;
 		SDL_Texture* nameTexture;
 		SDL_Texture* energyTexture;
 		SDL_Texture* armorTexture;
 	};
 
 	struct ShellPos {
+		int robotId;
 		int x1;
 		int y1;
 		int x2;
@@ -56,6 +58,8 @@ public:
 	static void RobotDataShow(int id, std::string name, int armor, int energy);
 	static void CannonShow(int id, int x1, int y1, int x2, int y2, bool blasted);
 	static void cleanupRobotTextures(int id);
+	static void markRobotDead(int id);
+	void initSkullTexture();
 	void drawArenaBorder();
  private:
 	static const int maxRobots;
@@ -67,6 +71,7 @@ public:
 	void ClearArena();
 	void RenderArena();
 	static unsigned int colors[];
+	static SDL_Texture* skullTexture;
 	static Viewer& getViewer();
 	std::mutex eventProcess;
 

@@ -14,28 +14,29 @@ ShellPool::ShellPool() : nextShellId(1) {
     }
 }
 
-uint32_t ShellPool::createShell(const Vector2& position, const Vector2& velocity, uint32_t currentTime) {
+uint32_t ShellPool::createShell(const Vector2& position, const Vector2& velocity, uint32_t currentTime, uint32_t ownerColor) {
     if (freeIds.empty()) {
         return 0;
     }
-    
+
     uint32_t poolIndex = freeIds.back();
     freeIds.pop_back();
-    
+
     AnimatedShell& shell = shells[poolIndex];
     shell.shellId = nextShellId++;
     shell.position = position;
     shell.velocity = velocity;
     shell.active = true;
     shell.creationTime = currentTime;
+    shell.ownerColor = ownerColor;
     shell.trailIndex = 0;
     shell.trailCount = 0;
     shell.trail.fill(TrailPoint());
-    
+
     shell.addTrailPoint(position, currentTime);
-    
+
     addToActiveList(&shell);
-    
+
     return shell.shellId;
 }
 
@@ -126,27 +127,34 @@ void ShellPool::removeFromActiveList(AnimatedShell* shell) {
 void ShellPool::renderShells(SDL_Renderer* renderer, float scale) const {
     for (const auto* shell : activeShells) {
         if (!shell->active || shell->trailCount < 2) continue;
-        
+
+        // Extract RGB from ownerColor for trail rendering
+        uint8_t r = (shell->ownerColor >> 24) & 0xFF;
+        uint8_t g = (shell->ownerColor >> 16) & 0xFF;
+        uint8_t b = (shell->ownerColor >> 8) & 0xFF;
+
         for (uint32_t i = 1; i < shell->trailCount; ++i) {
             const TrailPoint& prevPoint = shell->trail[(shell->trailIndex - i + 20) % 20];
             const TrailPoint& currPoint = shell->trail[(shell->trailIndex - i - 1 + 20) % 20];
-            
+
             if (prevPoint.alpha <= 0.0f || currPoint.alpha <= 0.0f) continue;
-            
+
             int x1 = static_cast<int>(prevPoint.position.x * scale);
             int y1 = static_cast<int>(prevPoint.position.y * scale);
             int x2 = static_cast<int>(currPoint.position.x * scale);
             int y2 = static_cast<int>(currPoint.position.y * scale);
-            
-            uint8_t alpha = static_cast<uint8_t>(255.0f * std::min(prevPoint.alpha, currPoint.alpha));
-            uint32_t color = (0xFF << 24) | (alpha << 16) | (alpha << 8) | alpha;
-            
-            lineColor(renderer, x1, y1, x2, y2, color);
+
+            // Apply trail alpha fade to owner color
+            uint8_t a = static_cast<uint8_t>(255.0f * std::min(prevPoint.alpha, currPoint.alpha));
+            uint32_t trailColor = (r << 24) | (g << 16) | (b << 8) | a;
+
+            lineColor(renderer, x1, y1, x2, y2, trailColor);
         }
-        
+
+        // Render shell head with full opacity owner color
         int shellX = static_cast<int>(shell->position.x * scale);
         int shellY = static_cast<int>(shell->position.y * scale);
-        filledCircleColor(renderer, shellX, shellY, 3, 0xFFFFFFFF);
+        filledCircleColor(renderer, shellX, shellY, 3, shell->ownerColor);
     }
 }
 
