@@ -6,3 +6,5 @@ build/
 # AI Agent files
 .opencode
 
+.cache/
+.claude/
