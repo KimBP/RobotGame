@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef ROBOT_H_
-#define ROBOT_H_
+#pragma once
 
 #include <string>
 #include "RobotTypes.h"
@@ -109,4 +108,3 @@ public:
 extern "C" __attribute__((visibility("default"))) Robot* getRobot(RobCtrl* robCtrl);
 
 } /* namespace RobotGame */
-#endif /* ROBOT_H_ */

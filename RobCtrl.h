@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef ROBCTRL_H_
-#define ROBCTRL_H_
+#pragma once
 
 #include <vector>
 #include "RobotTypes.h"
@@ -79,4 +78,3 @@ private:
 };
 
 } /* namespace RobotGame */
-#endif /* ROBCTRL_H_ */

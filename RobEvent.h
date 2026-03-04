@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef ROBEVENT_H_
-#define ROBEVENT_H_
+#pragma once
 
 #include "RobotTypes.h"
 #include <string>
@@ -29,4 +28,3 @@ private:
 };
 
 } /* namespace RobotGame */
-#endif /* ROBEVENT_H_ */

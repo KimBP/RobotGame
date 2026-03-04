@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef SCANNER_H_
-#define SCANNER_H_
+#pragma once
 
 #include "Robot.h"
 
@@ -27,4 +26,3 @@ private:
 	static const struct RobotGame::tune_t myTune;
 };
 
-#endif /* SCANNER_H_ */

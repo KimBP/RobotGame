@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef TRIGONOMETRY_H_
-#define TRIGONOMETRY_H_
+#pragma once
 
 #include "RobotTypes.h"
 
@@ -46,4 +45,3 @@ public:
 };
 
 } /* namespace RobotGame */
-#endif /* TRIGONOMETRY_H_ */

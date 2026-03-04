@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef CANNONPOSEVENT_H_
-#define CANNONPOSEVENT_H_
+#pragma once
 
 #include "RobEvent.h"
 
@@ -29,4 +28,3 @@ private:
 };
 
 } /* namespace RobotGame */
-#endif /* CANNONPOSEVENT_H_ */

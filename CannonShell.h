@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef CANNONSHELL_H_
-#define CANNONSHELL_H_
+#pragma once
 
 #include "RobotTypes.h"
 #include "RobCtrl.h"
@@ -50,4 +49,3 @@ private:
 };
 
 } /* namespace RobotGame */
-#endif /* CANNONSHELL_H_ */

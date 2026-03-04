@@ -5,8 +5,7 @@
  * Patrols arena edges, shoots at center, and adapts to threats
  */
 
-#ifndef EDGEPATROL_H_
-#define EDGEPATROL_H_
+#pragma once
 
 #include "Robot.h"
 #include <string>
@@ -59,5 +58,3 @@ private:
 };
 
 } // namespace RobotGame
-
-#endif /* EDGEPATROL_H_ */

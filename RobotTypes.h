@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef ROBOTTYPES_H_
-#define ROBOTTYPES_H_
+#pragma once
 
 namespace RobotGame {
 
@@ -88,4 +87,3 @@ const armor_t damageVals[DAMAGE_RANGE_CNT] = {8, 4, 2, 1};
  */
 
 } /* namespace RobotGame */
-#endif /* ROBOTTYPES_H_ */

@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef SCHEDULER_H_
-#define SCHEDULER_H_
+#pragma once
 
 #include <vector>
 #include "Robot.h"
@@ -51,4 +50,3 @@ private:
 };
 
 } /* namespace RobotGame */
-#endif /* SCHEDULER_H_ */

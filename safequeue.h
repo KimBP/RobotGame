@@ -12,8 +12,7 @@
  *   http://stackoverflow.com/questions/15278343/c11-thread-safe-queue
  */
 
-#ifndef SAFE_QUEUE
-#define SAFE_QUEUE
+#pragma once
 
 #include <queue>
 #include <mutex>
@@ -69,5 +68,5 @@ private:
   mutable std::mutex m;
   std::condition_variable c;
 };
-#endif
+
 

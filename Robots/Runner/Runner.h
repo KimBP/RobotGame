@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef RUNNER_H_
-#define RUNNER_H_
+#pragma once
 
 #include "Robot.h"
 
@@ -27,4 +26,3 @@ private:
 	static const std::string myName;
 };
 
-#endif /* RUNNER_H_ */

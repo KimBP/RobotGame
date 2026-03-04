@@ -5,8 +5,7 @@
  *      Author: AI Assistant
  */
 
-#ifndef EDGEROBOT_H_
-#define EDGEROBOT_H_
+#pragma once
 
 #include "../../Robot.h"
 #include <string>
@@ -67,5 +66,3 @@ private:
 };
 
 } /* namespace RobotGame */
-
-#endif /* EDGEROBOT_H_ */

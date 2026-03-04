@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef VIEWER_H_
-#define VIEWER_H_
+#pragma once
 
 #include <SDL2/SDL.h>
 #include "RobEvent.h"
@@ -111,4 +110,3 @@ public:
 };
 
 } /* namespace RobotGame */
-#endif /* VIEWER_H_ */

@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef LOGGER_H_
-#define LOGGER_H_
+#pragma once
 
 #include "safequeue.h"
 #include <string>
@@ -41,4 +40,3 @@ private:
 };
 
 } /* namespace RobotGame */
-#endif /* LOGGER_H_ */

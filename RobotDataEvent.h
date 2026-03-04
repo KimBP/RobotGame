@@ -5,8 +5,7 @@
  *      Author: kbp
  */
 
-#ifndef ROBOTDATAEVENT_H_
-#define ROBOTDATAEVENT_H_
+#pragma once
 
 #include "RobEvent.h"
 #include <string>
@@ -31,4 +30,3 @@ private:
 };
 
 } /* namespace RobotGame */
-#endif /* ROBOTDATAEVENT_H_ */
