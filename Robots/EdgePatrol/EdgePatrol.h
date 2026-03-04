@@ -44,7 +44,7 @@ private:
 	armor_t lastArmor;
 	range_t lastThreatRange;
 	angle_t lastThreatAngle;
-	int shotsInAir;
+	unsigned int shotsInAir;
 
 	// Configuration parameters (compile-time defaults)
 	static const RobotGame::precision_t detectionAngle = 10;

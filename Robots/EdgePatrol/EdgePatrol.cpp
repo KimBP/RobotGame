@@ -48,7 +48,6 @@ void RobotGame::EdgePatrol::run()
 #define GO_E   8
 
 	int horz, vert;
-	angle_t direction;
 
 	while (1) {
 		if (lastArmor > getArmor()) {
@@ -69,8 +68,8 @@ void RobotGame::EdgePatrol::run()
 										 std::string(" direction: ") +
 										 std::to_string(getDirection()));
 
-		int myX = getX();
-		int myY = getY();
+		auto myX = getX();
+		auto myY = getY();
 
 		switch (patrolState) {
 		case REACH_EDGE: {
@@ -144,6 +143,8 @@ void RobotGame::EdgePatrol::run()
 		}
 		}
 
+		angle_t direction;
+
 		switch (vert + horz) {
 		case 1:
 			direction = 0;
@@ -174,6 +175,8 @@ void RobotGame::EdgePatrol::run()
 			direction = 360;
 			break;
 		}
+
+		drive(direction, RobotGame::speedVals[myTune.tune_speed]);
 
 		angle_t shootDirection;
 
