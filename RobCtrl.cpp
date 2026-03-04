@@ -208,7 +208,7 @@ void RobCtrl::adjustDirection(angle_t target)
 		currDirection -= std::min(MAX_DIR_CHANGE, -delta);
 }
 
-bool RobCtrl::tick(unsigned int tick)
+bool RobCtrl::tick([[maybe_unused]] unsigned int tick)
 {
 	if (targetDirection == currDirection) {
 		adjustSpeed(targetSpeed);

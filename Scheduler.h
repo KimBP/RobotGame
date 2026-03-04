@@ -27,7 +27,7 @@ public:
 	void setBattleDelay(int delayMs);
 	int getBattleDelay() const;
 	void run();
-	const unsigned int getTick() { return tick;}
+	unsigned int getTick() { return tick;}
 
 private:
 	Scheduler() :

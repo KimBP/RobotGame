@@ -70,7 +70,7 @@ void CannonShell::tick(unsigned int tick) {
 	);
 }
 
-bool CannonShell::_tick(unsigned int tick) {
+bool CannonShell::_tick([[maybe_unused]] unsigned int tick) {
 
 	range_t tickDistance = static_cast<range_t>(SHELL_SPEED);
 	unsigned int distance = std::min(range, tickDistance);

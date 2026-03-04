@@ -63,7 +63,7 @@ void Viewer::PostEvent(RobEvent* ev)
 	getViewer().evQueue.enqueue(ev);
 }
 
-void Viewer::tick(unsigned int tick)
+void Viewer::tick([[maybe_unused]] unsigned int tick)
 {
 	getViewer().eventProcess.unlock();
 }
@@ -75,7 +75,7 @@ void Viewer::ClearArena()
 	SDL_RenderClear( gRenderer );
 }
 
-void Viewer::CannonShow(int id, int x1, int y1, int x2, int y2, bool blasted)
+void Viewer::CannonShow([[maybe_unused]] int id, int x1, int y1, int x2, int y2, bool blasted)
 {
 	struct ShellPos shell;
 	shell.robotId = id;
@@ -761,7 +761,6 @@ void Viewer::renderFrameWithLayers() {
 	// Get current time for animations
 	auto now = std::chrono::system_clock::now();
 	auto duration = now.time_since_epoch();
-	uint32_t currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 	
 	// === RENDER TERRAIN LAYER ===
 	SDL_SetRenderTarget(gRenderer, terrainLayer);
