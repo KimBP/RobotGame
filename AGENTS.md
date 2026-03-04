@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2026-01-12
 
 ## Active Technologies
+- C++17 (MANDATORY) + SDL2, SDL2_image, SDL2_ttf, SDL2_gfx (MANDATORY) (001-robot-colors-dead-state)
+- In-memory game state only (no persistent storage) (001-robot-colors-dead-state)
 
 - Shell Scripting (Bash), C++17 (for robots) + CMake build system, g++ compiler, tar utility (001-developer-package)
 - C++17 (from existing codebase) + SDL2, SDL2_ttf, SDL2_gfx, SDL2_image (from CMake configuration) (001-graphics-fixes)
@@ -31,15 +33,13 @@ Robot.h, Robot.cpp, RobotTypes.h, etc.
 Shell Scripting (Bash), C++17 (for robots): Follow standard conventions
 
 ## Recent Changes
+- 001-robot-colors-dead-state: Added C++17 (MANDATORY) + SDL2, SDL2_image, SDL2_ttf, SDL2_gfx (MANDATORY)
 - 001-developer-package: Added Shell Scripting (Bash), C++17 (for robots) + CMake build system, g++ compiler, tar utility
 
 - 001-fix-undefined-symbols: Added C++11 (based on existing .cproject configuration) + RobotGame framework (Robot, RobCtrl, Trigonometry classes), POSIX threading (pthread), SDL2 libraries (for game visualization)
 
-- 001-edge-patrol-robot: Added C++11 (based on existing .cproject configuration) + RobotGame framework (Robot, RobCtrl, Trigonometry classes), POSIX threading (pthread), SDL2 libraries (for game visualization)
 
-- 001-graphics-fixes: Added C++17 (from existing codebase) + SDL2, SDL2_ttf, SDL2_gfx, SDL2_image (from CMake configuration)
 
-- 001-edge-robot: Added C++17 + SDL2, SDL2_ttf, SDL2_gfx, SDL2_image (CMake-based build system)
 
 ## Build Commands
 
