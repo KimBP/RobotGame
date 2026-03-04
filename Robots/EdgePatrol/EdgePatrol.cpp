@@ -30,9 +30,6 @@ RobotGame::EdgePatrol::EdgePatrol(RobotGame::RobCtrl* robCtrl)
 {
 }
 
-RobotGame::EdgePatrol::~EdgePatrol() {
-}
-
 struct RobotGame::tune_t RobotGame::EdgePatrol::init(std::string& name) {
 	name = myName;
 	return myTune;

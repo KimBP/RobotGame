@@ -23,7 +23,7 @@ public:
 	Robot(RobCtrl* robCtrl)
 	: robCtrl(robCtrl) {};
 
-	virtual ~Robot();
+	virtual ~Robot() = default;
 	virtual struct tune_t init(std::string& name) = 0;
 	virtual void run() = 0;
 	virtual std::string name() const = 0;

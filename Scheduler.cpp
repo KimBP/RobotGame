@@ -45,10 +45,6 @@ void Scheduler::end()
 	inst.schedulerMtx.unlock();
 }
 
-Scheduler::~Scheduler() {
-	// TODO Auto-generated destructor stub
-}
-
 
 bool Scheduler::addRobot( Robot* (*getRobot)(RobCtrl* robCtrl))
 {

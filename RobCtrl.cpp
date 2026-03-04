@@ -33,10 +33,6 @@ goDie(false)
 	lock();
 };
 
-RobCtrl::~RobCtrl() {
-	// TODO Auto-generated destructor stub
-}
-
 void RobCtrl::setRobot(Robot* robot)
 {
 	int tune_params = MAX_TUNE;

@@ -10,10 +10,6 @@
 
 namespace RobotGame {
 
-Robot::~Robot() {
-	// TODO Auto-generated destructor stub
-}
-
 
 range_t Robot::scan(angle_t direction, precision_t precision)
 {

@@ -22,7 +22,7 @@ public:
 
 public:
 	RobCtrl(unsigned int posX, unsigned int posY);
-	virtual ~RobCtrl();
+	virtual ~RobCtrl() = default;
 
 	void setRobot(Robot* robot);
 	Robot* getRobot() const { return robot; };

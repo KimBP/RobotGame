@@ -11,10 +11,6 @@
 namespace RobotGame {
 
 
-RobotDataEvent::~RobotDataEvent() {
-	// TODO Auto-generated destructor stub
-}
-
 void RobotDataEvent::execute()
 {
 	Viewer::RobotDataShow(getId(), name, armor, energy);

@@ -12,7 +12,7 @@
 class Runner: public RobotGame::Robot {
 public:
 	Runner(RobotGame::RobCtrl* robCtrl);
-	virtual ~Runner();
+	virtual ~Runner() = default;
 
 	virtual struct RobotGame::tune_t init(std::string& name) {
 		name = myName;

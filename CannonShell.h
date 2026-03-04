@@ -25,7 +25,7 @@ private:
 	CannonShell(RobCtrl* owner, posx_t posX, posy_t posY,
 			angle_t direction, range_t range);
 public:
-	virtual ~CannonShell();
+	virtual ~CannonShell() = default;
 
 	bool _tick(unsigned int tick); /* Returns true if still in air */
 	bool blasted() const {return blast;};

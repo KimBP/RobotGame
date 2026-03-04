@@ -14,7 +14,7 @@ namespace RobotGame {
 class CannonPosEvent: public RobotGame::RobEvent {
 public:
 	CannonPosEvent(int id, posx_t x1, posy_t y1, posx_t x2, posy_t y2, bool blasted);
-	virtual ~CannonPosEvent();
+	virtual ~CannonPosEvent() = default;
 
 	virtual void execute();
 	virtual std::string getName() { return "CannonPos"; };

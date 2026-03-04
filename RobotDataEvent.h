@@ -18,7 +18,7 @@ public:
 	: RobEvent(id), name(name),
 	  armor(armor), energy(energy)
 	{};
-	virtual ~RobotDataEvent();
+	virtual ~RobotDataEvent() = default;
 	virtual void execute();
 	virtual std::string getName() { return "RobotData"; };
 

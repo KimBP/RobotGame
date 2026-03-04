@@ -14,7 +14,7 @@ namespace RobotGame {
 class RobotPosEvent: public RobotGame::RobEvent {
 public:
 	RobotPosEvent(int id, posx_t x, posy_t y);
-	virtual ~RobotPosEvent();
+	virtual ~RobotPosEvent() = default;
 
 	virtual void execute();
 	virtual std::string getName() { return "PosEvent"; };

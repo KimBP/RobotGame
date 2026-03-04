@@ -15,7 +15,7 @@ namespace RobotGame {
 class EdgeRobot: public Robot {
 public:
     EdgeRobot(RobCtrl* robCtrl);
-    virtual ~EdgeRobot();
+    virtual ~EdgeRobot() = default;
 
     virtual struct tune_t init(std::string& name);
     virtual void run();

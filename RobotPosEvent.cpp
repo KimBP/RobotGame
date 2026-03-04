@@ -15,9 +15,6 @@ RobotPosEvent::RobotPosEvent(int id, posx_t x, posy_t y)
 {
 }
 
-RobotPosEvent::~RobotPosEvent() {
-}
-
 void RobotPosEvent::execute()
 {
 	Viewer::RobotShow(getId(), posX, posY);

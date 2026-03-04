@@ -26,10 +26,6 @@ EdgeRobot::EdgeRobot(RobCtrl* robCtrl)
     // Constructor implementation complete
 }
 
-EdgeRobot::~EdgeRobot() {
-    // Cleanup any allocated resources
-    // Destructor implementation complete
-}
 
 struct tune_t EdgeRobot::init(std::string& name) {
     name = myName;

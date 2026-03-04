@@ -15,9 +15,6 @@ CannonPosEvent::CannonPosEvent(int id, posx_t x1, posy_t y1, posx_t x2, posy_t y
 {
 }
 
-CannonPosEvent::~CannonPosEvent() {
-}
-
 void CannonPosEvent::execute()
 {
 	Viewer::CannonShow(getId(), posX1, posY1, posX2, posY2, blasted);

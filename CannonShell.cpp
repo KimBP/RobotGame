@@ -36,9 +36,6 @@ CannonShell::CannonShell(RobCtrl* owner, posx_t posX, posy_t posY,
 {
 }
 
-CannonShell::~CannonShell() {
-	// TODO Auto-generated destructor stub
-}
 
 
 void CannonShell::tick(unsigned int tick) {

@@ -26,10 +26,6 @@ Scanner::Scanner(RobotGame::RobCtrl* robCtrl)
 {
 }
 
-Scanner::~Scanner() {
-	// TODO Auto-generated destructor stub
-}
-
 void Scanner::run()
 {
 	RobotGame::armor_t lastArmor = getArmor();

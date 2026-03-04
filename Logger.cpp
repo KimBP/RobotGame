@@ -10,10 +10,6 @@
 
 namespace RobotGame {
 
-Logger::~Logger() {
-	// TODO Auto-generated destructor stub
-}
-
 void Logger::Log(std::string name, std::string msg)
 {
 	Logger& inst = getLogger();

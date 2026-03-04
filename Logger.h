@@ -16,7 +16,7 @@ namespace RobotGame {
 class Logger {
 public:
 	Logger() : goDie(false), showDebug(true) {};
-	virtual ~Logger();
+	virtual ~Logger() = default;
 
 	void Runner();
 	void DoDie();

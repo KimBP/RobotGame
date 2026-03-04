@@ -32,7 +32,7 @@ public:
 private:
 	Scheduler() :
 		robCnt(0) {};
-	virtual ~Scheduler();
+	virtual ~Scheduler() = default;
 	Scheduler(Scheduler const&) = delete;      // No copy
 	void operator=(Scheduler const&) = delete; // No assignment
 

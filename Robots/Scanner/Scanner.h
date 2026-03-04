@@ -12,7 +12,7 @@
 class Scanner: public RobotGame::Robot {
 public:
 	Scanner(RobotGame::RobCtrl* robCtrl);
-	virtual ~Scanner();
+	virtual ~Scanner() = default;
 
 	virtual struct RobotGame::tune_t init(std::string& name) {
 		name = myName;

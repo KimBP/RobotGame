@@ -16,7 +16,7 @@ class RobEvent {
 public:
 	RobEvent(int id)
 	: id(id) {};
-	virtual ~RobEvent() {};
+	virtual ~RobEvent() = default;
 
 	virtual void execute() = 0;
 	virtual std::string getName() = 0;

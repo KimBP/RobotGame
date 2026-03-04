@@ -25,9 +25,6 @@ Runner::Runner(RobotGame::RobCtrl* robCtrl)
 	srand (time(NULL));
 }
 
-Runner::~Runner() {
-}
-
 void Runner::run()
 {
 #define STAY_H 	0
