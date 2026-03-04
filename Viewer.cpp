@@ -23,6 +23,8 @@ unsigned int Viewer::colors[] = {
 		0xFF000FFF
 };
 
+SDL_Texture* Viewer::skullTexture = nullptr;
+
 const int Viewer::maxRobots = 4;
 
 #define ARENA_WIDTH 1000
@@ -76,6 +78,7 @@ void Viewer::ClearArena()
 void Viewer::CannonShow(int id, int x1, int y1, int x2, int y2, bool blasted)
 {
 	struct ShellPos shell;
+	shell.robotId = id;
 	shell.x1 = x1/POS_TO_MAP_SCALE;
 	shell.x2 = x2/POS_TO_MAP_SCALE;
 	shell.y1 = y1/POS_TO_MAP_SCALE;
@@ -90,20 +93,26 @@ void Viewer::_CannonShow(struct ShellPos shell)
 		Vector2 explosionPos(static_cast<float>(shell.x2), static_cast<float>(shell.y2));
 		createExplosionEffect(static_cast<int>(explosionPos.x), static_cast<int>(explosionPos.y));
 	}
-	
+
 	// Create animated shell with velocity
 	Vector2 startPos(static_cast<float>(shell.x1), static_cast<float>(shell.y1));
 	Vector2 endPos(static_cast<float>(shell.x2), static_cast<float>(shell.y2));
 	Vector2 velocity = endPos - startPos;
 	velocity = velocity.normalized() * 300.0f; // Shell speed: 300 pixels per second
-	
+
 	// Get current time for animation
 	auto now = std::chrono::system_clock::now();
 	auto duration = now.time_since_epoch();
 	uint32_t currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-	
-	// Create animated shell
-	shellPool->createShell(startPos, velocity, currentTime);
+
+	// Get robot color for shell (default to white if robot not found)
+	uint32_t shellColor = 0xFFFFFFFF;
+	if (robots.count(shell.robotId)) {
+		shellColor = robots[shell.robotId].color;
+	}
+
+	// Create animated shell with owner color
+	shellPool->createShell(startPos, velocity, currentTime, shellColor);
 }
 
 void Viewer::RobotShow(int id, int x, int y)
@@ -113,11 +122,10 @@ void Viewer::RobotShow(int id, int x, int y)
 
 void Viewer::_RobotShow(int id, int x, int y)
 {
-	if (id >= maxRobots)
-		return;
-
+	// T021: Verify color assignment uses deterministic array indexing with modulo for >4 robots
 	if (! robots.count(id)) {
-		robots[id].color = colors[id];
+		robots[id].color = colors[id % maxRobots];
+		robots[id].isDead = false;
 		robots[id].nameTexture = 0;
 	}
 
@@ -209,11 +217,65 @@ void Viewer::cleanupRobotTextures(int id) {
 			it->second.armorTexture = nullptr;
 			Logger::LogDebug(std::string("Cleaned up armor texture for robot ") + std::to_string(id));
 		}
-		
+
 		// Remove robot from the map
 		viewer.robots.erase(it);
 		Logger::LogDebug(std::string("Removed dead robot ") + std::to_string(id) + std::string(" from viewer"));
 	}
+}
+
+void Viewer::markRobotDead(int id) {
+	Viewer& viewer = getViewer();
+	auto it = viewer.robots.find(id);
+	if (it != viewer.robots.end()) {
+		// Set dead flag
+		it->second.isDead = true;
+		Logger::LogDebug(std::string("Marked robot ") + std::to_string(id) + std::string(" as dead"));
+
+		// Clean up SDL textures to prevent memory leaks
+		if (it->second.nameTexture) {
+			SDL_DestroyTexture(it->second.nameTexture);
+			it->second.nameTexture = nullptr;
+		}
+		if (it->second.energyTexture) {
+			SDL_DestroyTexture(it->second.energyTexture);
+			it->second.energyTexture = nullptr;
+		}
+		if (it->second.armorTexture) {
+			SDL_DestroyTexture(it->second.armorTexture);
+			it->second.armorTexture = nullptr;
+		}
+		// Keep position and color for rendering dead robot
+	}
+}
+
+void Viewer::initSkullTexture() {
+	if (!gFont) {
+		Logger::LogError("Cannot create skull texture: No font loaded");
+		return;
+	}
+
+	if (!gRenderer) {
+		Logger::LogError("Cannot create skull texture: No renderer available");
+		return;
+	}
+
+	// Render skull character using UTF-8
+	SDL_Color whiteColor = {255, 255, 255, 255};
+	SDL_Surface* surface = TTF_RenderUTF8_Blended(gFont, "☠", whiteColor);
+
+	if (!surface) {
+		Logger::LogError(std::string("Failed to create skull surface: ") + std::string(TTF_GetError()));
+		skullTexture = nullptr;
+		return;
+	}
+
+	skullTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
+	if (!skullTexture) {
+		Logger::LogError(std::string("Failed to create skull texture: ") + std::string(SDL_GetError()));
+	}
+
+	SDL_FreeSurface(surface);
 }
 
 void Viewer::drawArenaBorder() {
@@ -401,6 +463,9 @@ Viewer::Viewer()
 		Logger::LogError("Game will continue without text rendering");
 	}
 
+	// Initialize skull texture for dead robot indication
+	initSkullTexture();
+
 	// Initialize animation system
 	shellPool = new ShellPool();
 	initializeRenderLayers();
@@ -507,8 +572,14 @@ void Viewer::PrintRobot(int id)
 {
 #define ROBOT_RADIUS 5
 
+	unsigned int color = robots[id].color;
 
-	filledCircleColor(gRenderer, robots[id].x, robots[id].y, ROBOT_RADIUS, robots[id].color);
+	// Reduce alpha to 50% for dead robots
+	if (robots[id].isDead) {
+		color = (color & 0xFFFFFF00) | 0x80;
+	}
+
+	filledCircleColor(gRenderer, robots[id].x, robots[id].y, ROBOT_RADIUS, color);
 }
 
 void Viewer::SetStatusViewPort()
@@ -529,6 +600,11 @@ void Viewer::ClearStatus()
 }
 void Viewer::PrintRobotStatus(int id)
 {
+	// Safety check: verify robot exists
+	if (!robots.count(id)) {
+		return;
+	}
+
 	int robStatusHeight = ARENA_HEIGHT / maxRobots;
 	int robStatusY      = id * robStatusHeight;
 
@@ -542,33 +618,71 @@ void Viewer::PrintRobotStatus(int id)
 	viewPort.h = robStatusHeight;
 	SDL_RenderSetViewport(gRenderer, &viewPort);
 
+	// T017: Add color indicator box at start of row
+	SDL_Rect colorBox;
+	colorBox.x = 5;
+	colorBox.y = 5;
+	colorBox.w = 10;
+	colorBox.h = 10;
+
+	// T020: Reduce alpha to 128 for dead robot entries
+	uint8_t alpha = robots[id].isDead ? 128 : 255;
+
 	SDL_SetRenderDrawColor( gRenderer,
 			(robots[id].color >> 24)& 0xFF, (robots[id].color >> 16) & 0xFF,
-			(robots[id].color >> 8) & 0xFF, robots[id].color & 0xFF);
+			(robots[id].color >> 8) & 0xFF, alpha);
 
+	// Draw color indicator box
+	SDL_RenderFillRect(gRenderer, &colorBox);
+
+	// T019: Add skull texture for dead robots
+	if (robots[id].isDead && skullTexture) {
+		SDL_Rect skullRect;
+		skullRect.x = 20;
+		skullRect.y = 2;
+		skullRect.w = 16;
+		skullRect.h = 16;
+		SDL_SetTextureAlphaMod(skullTexture, alpha);
+		SDL_RenderCopy(gRenderer, skullTexture, nullptr, &skullRect);
+		SDL_SetTextureAlphaMod(skullTexture, 255); // Reset alpha
+	}
+
+	// T018: Robot name is already rendered in robot color (existing code)
 	SDL_Rect nameRect;
 	nameRect.x = 1;
 	nameRect.y = 1;
 	nameRect.w = STATUS_WIDTH-2;
 	nameRect.h = 2*blockHeight-2;
-	if (SDL_RenderCopy( gRenderer, robots[id].nameTexture, 0, &nameRect)) {
-		Logger::LogDebug("Error rendering name");
+	if (robots[id].nameTexture) {
+		SDL_SetTextureAlphaMod(robots[id].nameTexture, alpha);
+		if (SDL_RenderCopy( gRenderer, robots[id].nameTexture, 0, &nameRect)) {
+			Logger::LogDebug("Error rendering name");
+		}
+		SDL_SetTextureAlphaMod(robots[id].nameTexture, 255); // Reset alpha
 	}
 
 	nameRect.x = 1;
 	nameRect.y = 2*blockHeight + 1;
 	nameRect.w = prefixWidth - 2;
 	nameRect.h = blockHeight - 2;
-	if (SDL_RenderCopy( gRenderer, robots[id].energyTexture, 0, &nameRect)) {
-		Logger::LogDebug("Error rendering energy");
+	if (robots[id].energyTexture) {
+		SDL_SetTextureAlphaMod(robots[id].energyTexture, alpha);
+		if (SDL_RenderCopy( gRenderer, robots[id].energyTexture, 0, &nameRect)) {
+			Logger::LogDebug("Error rendering energy");
+		}
+		SDL_SetTextureAlphaMod(robots[id].energyTexture, 255); // Reset alpha
 	}
 
 	nameRect.x = 1;
 	nameRect.y = 3*blockHeight + 1;
 	nameRect.w = prefixWidth - 2;
 	nameRect.h = blockHeight - 2;
-	if (SDL_RenderCopy( gRenderer, robots[id].armorTexture, 0, &nameRect)) {
-		Logger::LogDebug("Error rendering energy");
+	if (robots[id].armorTexture) {
+		SDL_SetTextureAlphaMod(robots[id].armorTexture, alpha);
+		if (SDL_RenderCopy( gRenderer, robots[id].armorTexture, 0, &nameRect)) {
+			Logger::LogDebug("Error rendering armor");
+		}
+		SDL_SetTextureAlphaMod(robots[id].armorTexture, 255); // Reset alpha
 	}
 
 	int energy = robots[id].energy * (STATUS_WIDTH - prefixWidth) / MAX_ENERGY;
@@ -628,8 +742,17 @@ void Viewer::renderFrameWithLayers() {
 			// Fallback to direct rendering if layer creation failed
 			SetArenaViewPort();
 			ClearArena();
-			for (unsigned int i = 0; i < robots.size(); i++) {
-				PrintRobot(i);
+			// Render dead robots first (lower z-order)
+			for (auto& robotPair : robots) {
+				if (robotPair.second.isDead) {
+					PrintRobot(robotPair.first);
+				}
+			}
+			// Render living robots second (on top)
+			for (auto& robotPair : robots) {
+				if (!robotPair.second.isDead) {
+					PrintRobot(robotPair.first);
+				}
 			}
 			return;
 		}
@@ -650,9 +773,17 @@ void Viewer::renderFrameWithLayers() {
 	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0x00);
 	SDL_RenderClear(gRenderer);
 	
-	// Render robots on robot layer
-	for (unsigned int i = 0; i < robots.size(); i++) {
-		PrintRobot(i);
+	// Render robots on robot layer - dead robots first (lower z-order)
+	for (auto& robotPair : robots) {
+		if (robotPair.second.isDead) {
+			PrintRobot(robotPair.first);
+		}
+	}
+	// Render living robots second (on top)
+	for (auto& robotPair : robots) {
+		if (!robotPair.second.isDead) {
+			PrintRobot(robotPair.first);
+		}
 	}
 	
 	// === RENDER EXPLOSION LAYER ===
