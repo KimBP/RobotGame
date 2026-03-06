@@ -15,6 +15,7 @@
 #include "Viewer.h"
 #include "RobotPosEvent.h"
 #include "RobotDataEvent.h"
+#include <iostream>
 #include <chrono>
 #include <thread>
 
@@ -26,6 +27,8 @@ Scheduler& Scheduler::getScheduler() {
 	static Scheduler instance;
 
 	srand (time(NULL));
+	// initialize stepPaused in case constructor default didn't run
+	instance.stepPaused = false;
 	return instance;
 }
 
@@ -174,7 +177,27 @@ void Scheduler::tickEnd()
 
 void Scheduler::run()
 {
+	// Initial lock to synchronize with viewer thread
 	schedulerMtx.lock();
+
+	// When step mode is enabled we want to show the initial robot positions
+	// before any ticks occur.  Post events for the current state so the
+	// viewer can render a starting frame.
+	if (stepModeEnabled) {
+		Logger::LogHead("Step mode initial render");
+		int id = 0;
+		for (RobCtrl* rob : robots) {
+			Viewer::PostEvent(new RobotPosEvent(id, rob->getX(), rob->getY()));
+			Viewer::PostEvent(new RobotDataEvent(id, rob->getName(), rob->getArmor(), rob->getEnergy()));
+			id++;
+		}
+		// Trigger the viewer and wait for it to finish drawing
+		Viewer::tick(tick);
+		schedulerMtx.lock();
+		// Pause after the initial frame as well
+		pauseForStepMode();
+	}
+
 	while (robots.size() > 1) {
 		std::vector<RobCtrl*>::iterator robIt;
 		for (robIt = robots.begin(); robIt != robots.end(); ++robIt) {
@@ -185,6 +208,7 @@ void Scheduler::run()
 			}
 		}
 		tickEnd();
+		pauseForStepMode();  // Pause for user input in step mode, otherwise continue immediately
 	}
 
 	Logger::LogHead("Game over");
@@ -215,6 +239,37 @@ void Scheduler::setBattleDelay(int delayMs) {
 
 int Scheduler::getBattleDelay() const {
 	return battleDelayMs;
+}
+
+void Scheduler::setStepMode(bool enabled) {
+	stepModeEnabled = enabled;
+}
+
+void Scheduler::pauseForStepMode() {
+	if (!stepModeEnabled) {
+		return;
+	}
+
+	// mark paused before releasing lock so viewer can see the state
+	stepPaused = true;
+	// signal viewer so it can bail out of any wait
+	Viewer::notifyEvent();
+
+	// Unlock to let the viewer thread continue processing/rendering.  While the
+	// scheduler is unlocked the viewer will detect `stepPaused` and avoid
+	// clearing the screen, preserving the last rendered frame.
+	schedulerMtx.unlock();
+
+	std::cout << "\n[Step Mode] Tick " << tick << " - Press Enter to advance to next tick: ";
+	std::cout.flush();
+	std::string input;
+	std::getline(std::cin, input);
+
+	// Re‑lock before returning to maintain scheduler invariants.
+	schedulerMtx.lock();
+	stepPaused = false;
+	// let the viewer know pause state cleared
+	Viewer::notifyEvent();
 }
 
 } /* namespace RobotGame */

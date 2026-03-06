@@ -65,7 +65,17 @@ void Viewer::PostEvent(RobEvent* ev)
 
 void Viewer::tick([[maybe_unused]] unsigned int tick)
 {
-	getViewer().eventProcess.unlock();
+	Viewer& inst = getViewer();
+	std::lock_guard<std::mutex> lk(inst.eventMutex);
+	inst.eventCv.notify_one();
+}
+
+// helper used by scheduler to wake the viewer (e.g. when pause state changes)
+void Viewer::notifyEvent()
+{
+	Viewer& inst = getViewer();
+	std::lock_guard<std::mutex> lk(inst.eventMutex);
+	inst.eventCv.notify_one();
 }
 
 void Viewer::ClearArena()
@@ -77,6 +87,7 @@ void Viewer::ClearArena()
 
 void Viewer::CannonShow([[maybe_unused]] int id, int x1, int y1, int x2, int y2, bool blasted)
 {
+
 	struct ShellPos shell;
 	shell.robotId = id;
 	shell.x1 = x1/POS_TO_MAP_SCALE;
@@ -129,9 +140,11 @@ void Viewer::_RobotShow(int id, int x, int y)
 		robots[id].nameTexture = 0;
 	}
 
+
 	robots[id].x = x/POS_TO_MAP_SCALE;
 	robots[id].y = y/POS_TO_MAP_SCALE;
 }
+
 
 void Viewer::RobotDataShow(int id, std::string name, int armor, int energy)
 {
@@ -315,47 +328,75 @@ void Viewer::drawArenaBorder() {
 
 void Viewer::Runner()
 {
-	while(!goDie) {
+    while(!goDie) {
+        bool isPaused = Scheduler::getScheduler().isStepPaused();
+        
+        // Only wait for events if NOT paused; when paused, just render continuously
+        if (!isPaused) {
+            auto &sched = Scheduler::getScheduler();
+            std::unique_lock<std::mutex> lock(eventMutex);
+            eventCv.wait(lock, [&]{
+                return goDie || !evQueue.empty();
+            });
+            
+            // drain queue while holding the lock
+            Logger::LogDebug(std::string("Queue has ") + std::to_string(evQueue.size()) + std::string(" element(s)"));
+            while (!evQueue.empty()) {
+                RobEvent* ev = evQueue.dequeue();
+                // allow notifications while processing
+                lock.unlock();
+                ev->execute();
+                delete ev;
+                lock.lock();
+            }
+            lock.unlock();
+        } else {
+            // When paused, just drain any queued events without blocking
+            Logger::LogDebug(std::string("Queue has ") + std::to_string(evQueue.size()) + std::string(" element(s)"));
+            while (!evQueue.empty()) {
+                RobEvent* ev = evQueue.dequeue();
+                ev->execute();
+                delete ev;
+            }
+        }
 
-		eventProcess.lock();
-		Logger::LogDebug(std::string("Queue has ") + std::to_string(evQueue.size()) + std::string(" element(s)"));
-		while (!evQueue.empty()) {
-			RobEvent* ev = evQueue.dequeue();
+        // Update animations
+        updateExplosionEffects();
+        
+        // Update shell pool with current time
+        auto now = std::chrono::system_clock::now();
+        auto duration = now.time_since_epoch();
+        uint32_t currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+        shellPool->updateShells(currentTime);
+        
+        // Render using layered compositing
+        renderFrameWithLayers();
+        
+        SDL_RenderPresent( gRenderer );
 
-			ev->execute();
-			delete ev;
-		}
-		// Update animations
-		updateExplosionEffects();
-		
-		// Update shell pool with current time
-		auto now = std::chrono::system_clock::now();
-		auto duration = now.time_since_epoch();
-		uint32_t currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-		shellPool->updateShells(currentTime);
-		
-		// Render using layered compositing
-		renderFrameWithLayers();
-		
-		SDL_RenderPresent( gRenderer );
+        SetStatusViewPort();
+        ClearStatus();
+        for (unsigned int i=0; i < robots.size(); i++) {
+            PrintRobotStatus(i);
+        }
+        SDL_RenderPresent( gRenderer );
 
-		SetStatusViewPort();
-		ClearStatus();
-		for (unsigned int i=0; i < robots.size(); i++) {
-			PrintRobotStatus(i);
-		}
-		SDL_RenderPresent( gRenderer );
+        SDL_Event event;
+        if (SDL_PollEvent(&event)) {
+            if( event.type == SDL_QUIT )
+            {
+                goDie = true;
+            }
+        }
 
-		SDL_Event event;
-		if (SDL_PollEvent(&event)) {
-			if( event.type == SDL_QUIT )
-			{
-				goDie = true;
-			}
-		}
-
-		Scheduler::end();
-	}
+        if (!Scheduler::getScheduler().isStepPaused()) {
+            // hand back control to scheduler
+            Scheduler::end();
+        } else {
+            // keep rendering while paused
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
 }
 
 
@@ -470,8 +511,7 @@ Viewer::Viewer()
 	shellPool = new ShellPool();
 	initializeRenderLayers();
 	
-	// Wait for scheduler to make us run
-	eventProcess.lock();
+	// No initial lock required when using condition variable
 }
 
 SDL_Renderer* Viewer::createRendererWithVSyncFallback(SDL_Window* window) {
@@ -773,6 +813,7 @@ void Viewer::renderFrameWithLayers() {
 	SDL_RenderClear(gRenderer);
 	
 	// Render robots on robot layer - dead robots first (lower z-order)
+	// Render robots on robot layer - dead robots first (lower z-order)
 	for (auto& robotPair : robots) {
 		if (robotPair.second.isDead) {
 			PrintRobot(robotPair.first);
@@ -796,18 +837,22 @@ void Viewer::renderFrameWithLayers() {
 	// === COMPOSITE LAYERS ===
 	SDL_SetRenderTarget(gRenderer, nullptr);
 	
-	// Clear main render target
+	// Clear main render target (arena area only)
 	SetArenaViewPort();
 	ClearArena();
 	
-	// Composite layers in correct order
-	SDL_Rect renderRect = {0, 0, ARENA_WIDTH, ARENA_HEIGHT};
+	// Reset viewport to full screen for RenderCopy (viewport doesn't affect RenderCopy dest coords)
+	SDL_RenderSetViewport(gRenderer, nullptr);
+	
+	// Composite layers in correct order using screen-absolute coordinates
+	SDL_Rect renderRect = {STATUS_WIDTH, 0, ARENA_WIDTH, ARENA_HEIGHT};
 	SDL_RenderCopy(gRenderer, terrainLayer, nullptr, &renderRect);
 	SDL_RenderCopy(gRenderer, robotLayer, nullptr, &renderRect);
 	SDL_RenderCopy(gRenderer, explosionLayer, nullptr, &renderRect);
 	
-	// Draw arena border on top of everything
-	drawArenaBorder();
+	// Draw arena border on top of everything (set viewport back for drawing)
+	// SetArenaViewPort();
+	// drawArenaBorder();
 	
 	// Render shells directly (they use their own rendering system)
 	shellPool->renderShells(gRenderer);
