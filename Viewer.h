@@ -52,6 +52,8 @@ public:
 	static void tick(unsigned int tick);
 	static void Start();
 	static void PostEvent(RobEvent* ev);
+	// notify viewer thread that new data/state is available
+	static void notifyEvent();
 
 	static void RobotShow(int id, int x, int y);
 	static void RobotDataShow(int id, std::string name, int armor, int energy);
@@ -72,7 +74,8 @@ public:
 	static unsigned int colors[];
 	static SDL_Texture* skullTexture;
 	static Viewer& getViewer();
-	std::mutex eventProcess;
+	std::mutex eventMutex;
+	std::condition_variable eventCv;
 
 	void SetArenaViewPort();
 	void PrintRobot(int id);
