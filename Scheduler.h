@@ -52,13 +52,7 @@ private:
 	unsigned int tick;
 	int battleDelayMs = 16; // Default 16ms (60 FPS)
 	bool stepModeEnabled;
-	bool stepPaused; // true while scheduler is waiting for user input
 	std::mutex schedulerMtx;
-
-public:
-	// Accessors for step mode state (used by viewer)
-	bool isStepModeEnabled() const { return stepModeEnabled; }
-	bool isStepPaused() const { return stepPaused; }
 
 };
 

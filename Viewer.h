@@ -52,8 +52,6 @@ public:
 	static void tick(unsigned int tick);
 	static void Start();
 	static void PostEvent(RobEvent* ev);
-	// notify viewer thread that new data/state is available
-	static void notifyEvent();
 
 	static void RobotShow(int id, int x, int y);
 	static void RobotDataShow(int id, std::string name, int armor, int energy);
