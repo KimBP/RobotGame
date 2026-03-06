@@ -27,8 +27,6 @@ Scheduler& Scheduler::getScheduler() {
 	static Scheduler instance;
 
 	srand (time(NULL));
-	// initialize stepPaused in case constructor default didn't run
-	instance.stepPaused = false;
 	return instance;
 }
 
@@ -250,14 +248,6 @@ void Scheduler::pauseForStepMode() {
 		return;
 	}
 
-	// mark paused before releasing lock so viewer can see the state
-	stepPaused = true;
-	// signal viewer so it can bail out of any wait
-	Viewer::notifyEvent();
-
-	// Unlock to let the viewer thread continue processing/rendering.  While the
-	// scheduler is unlocked the viewer will detect `stepPaused` and avoid
-	// clearing the screen, preserving the last rendered frame.
 	schedulerMtx.unlock();
 
 	std::cout << "\n[Step Mode] Tick " << tick << " - Press Enter to advance to next tick: ";
@@ -265,11 +255,7 @@ void Scheduler::pauseForStepMode() {
 	std::string input;
 	std::getline(std::cin, input);
 
-	// Re‑lock before returning to maintain scheduler invariants.
 	schedulerMtx.lock();
-	stepPaused = false;
-	// let the viewer know pause state cleared
-	Viewer::notifyEvent();
 }
 
 } /* namespace RobotGame */
