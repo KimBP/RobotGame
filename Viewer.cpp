@@ -70,14 +70,6 @@ void Viewer::tick([[maybe_unused]] unsigned int tick)
 	inst.eventCv.notify_one();
 }
 
-// helper used by scheduler to wake the viewer (e.g. when pause state changes)
-void Viewer::notifyEvent()
-{
-	Viewer& inst = getViewer();
-	std::lock_guard<std::mutex> lk(inst.eventMutex);
-	inst.eventCv.notify_one();
-}
-
 void Viewer::ClearArena()
 {
 	// Black - clear
@@ -329,16 +321,12 @@ void Viewer::drawArenaBorder() {
 void Viewer::Runner()
 {
     while(!goDie) {
-        bool isPaused = Scheduler::getScheduler().isStepPaused();
-        
-        // Only wait for events if NOT paused; when paused, just render continuously
-        if (!isPaused) {
-            auto &sched = Scheduler::getScheduler();
+        {
             std::unique_lock<std::mutex> lock(eventMutex);
             eventCv.wait(lock, [&]{
                 return goDie || !evQueue.empty();
             });
-            
+
             // drain queue while holding the lock
             Logger::LogDebug(std::string("Queue has ") + std::to_string(evQueue.size()) + std::string(" element(s)"));
             while (!evQueue.empty()) {
@@ -348,15 +336,6 @@ void Viewer::Runner()
                 ev->execute();
                 delete ev;
                 lock.lock();
-            }
-            lock.unlock();
-        } else {
-            // When paused, just drain any queued events without blocking
-            Logger::LogDebug(std::string("Queue has ") + std::to_string(evQueue.size()) + std::string(" element(s)"));
-            while (!evQueue.empty()) {
-                RobEvent* ev = evQueue.dequeue();
-                ev->execute();
-                delete ev;
             }
         }
 
@@ -371,8 +350,6 @@ void Viewer::Runner()
         
         // Render using layered compositing
         renderFrameWithLayers();
-        
-        SDL_RenderPresent( gRenderer );
 
         SetStatusViewPort();
         ClearStatus();
@@ -389,12 +366,9 @@ void Viewer::Runner()
             }
         }
 
-        if (!Scheduler::getScheduler().isStepPaused()) {
+        if (!goDie) {
             // hand back control to scheduler
             Scheduler::end();
-        } else {
-            // keep rendering while paused
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 }
@@ -633,10 +607,11 @@ void Viewer::SetStatusViewPort()
 
 void Viewer::ClearStatus()
 {
-	// Black - clear
+	// Fill only the status area - SDL_RenderClear ignores the viewport and would
+	// wipe the entire screen including the arena that was just rendered.
 	SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
-	SDL_RenderClear( gRenderer );
-
+	SDL_Rect statusRect = { 0, 0, STATUS_WIDTH, ARENA_HEIGHT };
+	SDL_RenderFillRect( gRenderer, &statusRect );
 }
 void Viewer::PrintRobotStatus(int id)
 {
@@ -851,8 +826,8 @@ void Viewer::renderFrameWithLayers() {
 	SDL_RenderCopy(gRenderer, explosionLayer, nullptr, &renderRect);
 	
 	// Draw arena border on top of everything (set viewport back for drawing)
-	// SetArenaViewPort();
-	// drawArenaBorder();
+	SetArenaViewPort();
+	drawArenaBorder();
 	
 	// Render shells directly (they use their own rendering system)
 	shellPool->renderShells(gRenderer);
