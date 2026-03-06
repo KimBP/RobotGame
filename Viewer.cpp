@@ -586,14 +586,13 @@ void Viewer::PrintRobot(int id)
 {
 #define ROBOT_RADIUS 5
 
-	unsigned int color = robots[id].color;
+	unsigned int c = robots[id].color;
+	Uint8 r = (c >> 24) & 0xFF;
+	Uint8 g = (c >> 16) & 0xFF;
+	Uint8 b = (c >>  8) & 0xFF;
+	Uint8 a = robots[id].isDead ? 0x80 : (c & 0xFF);
 
-	// Reduce alpha to 50% for dead robots
-	if (robots[id].isDead) {
-		color = (color & 0xFFFFFF00) | 0x80;
-	}
-
-	filledCircleColor(gRenderer, robots[id].x, robots[id].y, ROBOT_RADIUS, color);
+	filledCircleRGBA(gRenderer, robots[id].x, robots[id].y, ROBOT_RADIUS, r, g, b, a);
 }
 
 void Viewer::SetStatusViewPort()
