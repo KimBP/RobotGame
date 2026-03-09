@@ -21,7 +21,7 @@ public:
 	static void Runner(RobCtrl* obj);
 
 public:
-	RobCtrl(unsigned int posX, unsigned int posY);
+	RobCtrl(int id, unsigned int posX, unsigned int posY);
 	virtual ~RobCtrl() = default;
 
 	void setRobot(Robot* robot);
@@ -49,6 +49,7 @@ public:
 	std::string getName() const { return name; };
 	void doDie() { goDie = true; };
 	void checkGoDie() { if (goDie) {exit(0); } };
+	int getId() const { return viewerId; };
 
 public:
 	armor_t damage(armor_t damage);
@@ -74,6 +75,7 @@ private:
 	unsigned int activeShells;
 
 	bool goDie;
+	int viewerId;
 	std::mutex mtx;
 };
 
