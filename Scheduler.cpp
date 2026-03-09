@@ -81,7 +81,7 @@ bool Scheduler::addRobot( Robot* (*getRobot)(RobCtrl* robCtrl))
 //		y = 100;
 //	}
 
-	RobCtrl* robCtrl = new RobCtrl(x,y);
+	RobCtrl* robCtrl = new RobCtrl(inst.robCnt,x,y);
 	Robot* robot = (*getRobot)(robCtrl);
 	robCtrl->setRobot(robot);
 	inst.robots.push_back(robCtrl);
@@ -117,18 +117,16 @@ void Scheduler::tickEnd()
 	RobCtrl* robCtrl;
 	/* Iterate over all robots and update everything */
 	robCtrl = iterateRobots(0);
-	int id = 0;
 	std::vector<int> deadRobots;
 	while (0 != robCtrl) {
 		bool stillAlive = robCtrl->tick(tick);
 		if (stillAlive) {
-			Viewer::PostEvent(new RobotPosEvent(id, robCtrl->getX(), robCtrl->getY()));
+			Viewer::PostEvent(new RobotPosEvent(robCtrl->getId(), robCtrl->getX(), robCtrl->getY()));
 		} else {
 			// Robot died - schedule for cleanup
-			deadRobots.push_back(id);
-			Logger::LogDebug(std::string("Robot ") + std::to_string(id) + std::string(" died, scheduling cleanup"));
+			deadRobots.push_back(robCtrl->getId());
+			Logger::LogDebug(std::string("Robot ") + std::to_string(robCtrl->getId()) + std::string(" died, scheduling cleanup"));
 		}
-		id++;
 		robCtrl = iterateRobots(robCtrl);
 	}
 	
@@ -141,11 +139,9 @@ void Scheduler::tickEnd()
 
 
 	robCtrl = iterateRobots(0);
-	id = 0;
 	while (0 != robCtrl) {
-		Viewer::PostEvent(new RobotDataEvent(id, robCtrl->getName(),
-						robCtrl->getArmor(), robCtrl->getEnergy()));
-		id++;
+		Viewer::PostEvent(new RobotDataEvent(robCtrl->getId(), robCtrl->getName(),
+					robCtrl->getArmor(), robCtrl->getEnergy()));
 		robCtrl = iterateRobots(robCtrl);
 	}
 
@@ -183,11 +179,9 @@ void Scheduler::run()
 	// viewer can render a starting frame.
 	if (stepModeEnabled) {
 		Logger::LogHead("Step mode initial render");
-		int id = 0;
 		for (RobCtrl* rob : robots) {
-			Viewer::PostEvent(new RobotPosEvent(id, rob->getX(), rob->getY()));
-			Viewer::PostEvent(new RobotDataEvent(id, rob->getName(), rob->getArmor(), rob->getEnergy()));
-			id++;
+			Viewer::PostEvent(new RobotPosEvent(rob->getId(), rob->getX(), rob->getY()));
+			Viewer::PostEvent(new RobotDataEvent(rob->getId(), rob->getName(), rob->getArmor(), rob->getEnergy()));
 		}
 		// Trigger the viewer and wait for it to finish drawing
 		Viewer::tick(tick);
